@@ -1,10 +1,20 @@
 cmake_minimum_required(VERSION 3.23)
 
-project(Poddy)
+project(Poddy LANGUAGES CXX)
 
-add_executable(Poddy)
+set(CMAKE_CXX_STANDARD 17)
 
-target_sources(Poddy
+add_executable(poddy)
+
+add_compile_options(-Wall -Wextra)
+
+target_sources(poddy
     PRIVATE
         src/main.cpp
+		src/poddy.hpp
 )
+
+add_subdirectory(src/tui)
+add_subdirectory(src/gpod)
+
+target_link_libraries(poddy PRIVATE PoddyTui GpodXX)
