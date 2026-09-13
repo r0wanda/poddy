@@ -13,6 +13,7 @@ target_sources(GpodXX
 			gpod.hpp
 )
 
+target_include_directories(GpodXX PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_include_directories(GpodXX PRIVATE ${LIBGPOD_INCLUDE_DIRS})
 target_compile_options(GpodXX PRIVATE ${LIBGPOD_CFLAGS_OTHER})
 target_link_libraries(GpodXX PRIVATE ${LIBGPOD_LIBRARIES})

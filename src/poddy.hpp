@@ -3,6 +3,14 @@
 #include "tui/tui.hpp"
 #include "gpod/gpod.hpp"
 #include "podmod/podmod.hpp"
+#include <ftxui/component/component.hpp>
+#include <ftxui/component/app.hpp>
+#include <ftxui/dom/elements.hpp>
+
+class PoddyMain extends PodMod {
+public:
+	Poddy()
+};
 
 class Poddy {
 public:
@@ -13,6 +21,6 @@ public:
 		 
 	}
 	void findIpod() {
-		tui.popup
+		tui.popup();
 	}
 };
