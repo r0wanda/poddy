@@ -4,23 +4,23 @@
 #include "gpod/gpod.hpp"
 #include "podmod/podmod.hpp"
 #include <ftxui/component/component.hpp>
-#include <ftxui/component/app.hpp>
 #include <ftxui/dom/elements.hpp>
 
-class PoddyMain extends PodMod {
+class PoddyMain : public PodMod {
 public:
-	Poddy()
+	PoddyMain();
+private:
+	int selected;
+	ftxui::Component controls;
+	ftxui::Component mainMenu;
+	ftxui::Component info;
 };
 
 class Poddy {
 public:
-	Tui tui;
-	Gpod gpod;
+	Tui *tui;
+	Gpod *gpod;
 	std::vector<PodMod> modules;
-	Poddy() {
-		 
-	}
-	void findIpod() {
-		tui.popup();
-	}
+	Poddy(std::vector<PodMod> mods);
+	void findIpod();
 };

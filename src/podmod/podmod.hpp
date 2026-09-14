@@ -5,6 +5,7 @@
 #include <ftxui/dom/elements.hpp>
 
 class PodMod {
+public:
 	ftxui::Component content;
 	std::string name;
 };

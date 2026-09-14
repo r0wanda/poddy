@@ -14,7 +14,8 @@
                 "/usr/include/libmount",
                 "/usr/include/blkid",
                 "/usr/include/sysprof-6",
-                "${workspaceFolder}/build/_deps/ftxui-src/include"
+                "${workspaceFolder}/build/_deps/ftxui-src/include",
+                "/usr/include/udisks2"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc"
