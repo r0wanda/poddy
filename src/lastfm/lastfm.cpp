@@ -5,18 +5,24 @@
 #include <curlpp/cURLpp.hpp>
 #include "lastfm.hpp"
 #include "cache.hpp"
+#include "../gpod/gpod.hpp"
 #define GERROR(e, fatal) if (e) { if (e->message) std::cerr << e->message; g_error_free(e); e = NULL; if (fatal) return 1; }
 
-int lfm() {
+struct LastFmSettings {
+	bool useCache = true;
+	std::vector<std::string> ignoredArtists;
+};
+
+int lfm(Gpod *gpod) {
 	cURLpp::initialize();
-	dotenv::init();
+	//dotenv::init();
 	std::string inp;
 
 	Lastfm lfm(std::getenv("LASTFM_API_KEY"), std::getenv("LASTFM_API_SECRET"));
 	Cache cache;
 	lfm.load(&cache);
 
-	GError *err = nullptr;
+	/*GError *err = nullptr;
 	Itdb_iTunesDB *itdb;
 	if (inp.empty()) {
 		if (argc < 2) {
@@ -27,21 +33,21 @@ int lfm() {
 	}
 
 	itdb = itdb_parse(inp.data(), &err);
-	GERROR(err, true);
+	GERROR(err, true);*/
 
-	std::cout << "tracks: " << g_list_length(itdb->tracks) << std::endl;
-	GList *it;
+	std::cout << "tracks: " << gpod.tracks.size() << std::endl;
+	//GList *it;
 	Scrobble *first = nullptr;
 	Scrobble *prev = nullptr;
 	int n = 0;
 	int total = 0;
 	int ign = 0;
 	
-	for (it = itdb->tracks; it != NULL; it = it->next) {
-		Itdb_Track *tr = (Itdb_Track*)it->data;
+	for (const GpodTrack &tr : gpod.tracks) {
 		if (tr->playcount < 1) continue;
+
 		std::string title(tr->title);
-		unsigned short playcount = static_cast<unsigned short>(tr->playcount);
+		unsigned short playcount = tr->playcount;
 		unsigned long ts = static_cast<unsigned long>(tr->time_played);
 		cache.dbset(&cache.db, title, playcount, ts);
 		auto cData = cache.dbget(&cache.initdb, tr);

@@ -15,6 +15,8 @@ public:
 	GpodArtist *artist;
 	GpodAlbum *album;
 	std::string title;
+	unsigned short playcount;
+	unsigned short recentPlaycount;
 	GpodTrack(Itdb_Track *tr);
 };
 class GpodAlbum {
