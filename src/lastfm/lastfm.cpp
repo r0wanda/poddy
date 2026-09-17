@@ -9,7 +9,7 @@
 #define GERROR(e, fatal) if (e) { if (e->message) std::cerr << e->message; g_error_free(e); e = NULL; if (fatal) return 1; }
 
 struct LastFmSettings {
-	bool useCache = true;
+	bool useCache = false;
 	std::vector<std::string> ignoredArtists;
 };
 
@@ -49,7 +49,7 @@ int lfm(Gpod *gpod) {
 		std::string title(tr->title);
 		unsigned short playcount = tr->playcount;
 		unsigned long ts = static_cast<unsigned long>(tr->time_played);
-		cache.dbset(&cache.db, title, playcount, ts);
+		cache.dbset(&cache.db, tr->title, tr->playcount, ts);
 		auto cData = cache.dbget(&cache.initdb, tr);
 
 		if (ts <= cData.second) continue;

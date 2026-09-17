@@ -1,8 +1,18 @@
 #include "gpod.hpp"
 #include <iostream>
 #include <thread>
+#include <taglib/tag.h>
 
-GpodTrack::GpodTrack() {}
+GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): title(tr->title), playcount() {}
+GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp) {
+	TagLib::Tag *tag;
+	Itdb_Track *tr = ref.tag();
+	if (tag == NULL) {
+		// TODO: handle incomplete gpodtracks
+		gp->throwG(g_error_new(G_FILE_ERROR, 1, "file has no tags"));
+		return;
+	}
+}
 
 Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle):
 path(dbPath), errorHandle(errHandle), err(nullptr), tracks() {

@@ -5,19 +5,23 @@
 #include <GLib.h>
 #include <functional>
 #include <gpod/itdb.h>
+#include <taglib/tag.h>
 
 class GpodArtist;
 class GpodAlbum;
 
 class GpodTrack {
 public:
+	Gpod *gpod;
 	Itdb_Track *track;
 	GpodArtist *artist;
 	GpodAlbum *album;
 	std::string title;
 	unsigned short playcount;
 	unsigned short recentPlaycount;
-	GpodTrack(Itdb_Track *tr);
+	unsigned long ts;
+	GpodTrack(Itdb_Track *tr, Gpod *gp);
+	GpodTrack(TagLib::FileRef ref, Gpod *gp);
 };
 class GpodAlbum {
 public:
@@ -47,7 +51,11 @@ public:
 	Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle);
 	void process(std::function<void(int)> perCb);
 	~Gpod();
-private:
+	friend class GpodTrack;
+	friend class GpodAlbum;
+	friend class GpodArtist;
+	friend class GpodPlaylist;
+protected:
 	void throwG(bool fatal);
 	std::string path;
 	std::function<void(GError*, bool)> errHandler;
