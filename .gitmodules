@@ -4,3 +4,6 @@
 [submodule "external/curlpp"]
 	path = external/curlpp
 	url = https://github.com/jpbarrette/curlpp.git
+[submodule "external/libgpod"]
+	path = external/libgpod
+	url = https://github.com/fadingred/libgpod.git
