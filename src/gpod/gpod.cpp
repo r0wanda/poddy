@@ -2,11 +2,12 @@
 #include <iostream>
 #include <thread>
 #include <taglib/tag.h>
+#include <taglib/fileref.h>
 
 GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): title(tr->title), playcount() {}
 GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp) {
-	TagLib::Tag *tag;
-	Itdb_Track *tr = ref.tag();
+	TagLib::Tag *tag = ref.tag();
+	Itdb_Track *tr = itdb_track_new();
 	if (tag == NULL) {
 		// TODO: handle incomplete gpodtracks
 		gp->throwG(g_error_new(G_FILE_ERROR, 1, "file has no tags"));
@@ -15,8 +16,8 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp) {
 }
 
 Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle):
-path(dbPath), errorHandle(errHandle), err(nullptr), tracks() {
-    itdb = itdb_parse(path, &err);
+path(dbPath), errHandle(errHandle), err(nullptr), tracks() {
+    itdb = itdb_parse(path.c_str(), &err);
 	throwG(true);
 }
 
@@ -27,7 +28,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 	GList *it;
 	for (it = itdb->tracks; it != NULL; it = it->next) {
 		Itdb_Track *tr = (Itdb_Track*)it->data;
-		GpodTrack *gt = new GpodTrack(tr);
+		GpodTrack *gt = new GpodTrack(tr, this);
 		std::string arName(tr->artist);
 		std::string alName(tr->album);
 
@@ -47,7 +48,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 
 		// add album to artist, synchronise everything
 		GpodAlbum *album;
-		if (artist->albums.find(alName) == artists->albums.end()) {
+		if (artist->albums.find(alName) == artist->albums.end()) {
 			album = new GpodAlbum(alName);
 			artist->albums[alName] = album;
 		} else {

@@ -2,10 +2,11 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <GLib.h>
+#include <glib.h>
 #include <functional>
 #include <gpod/itdb.h>
 #include <taglib/tag.h>
+#include <taglib/fileref.h>
 
 class GpodArtist;
 class GpodAlbum;
@@ -40,13 +41,13 @@ class GpodPlaylist {
 public:
 
 	std::vector<GpodTrack*> tracks;
-}
+};
 
 class Gpod {
 public:
 	Itdb_iTunesDB *itdb;
 	std::vector<GpodTrack*> tracks;
-	std::map<std::string, GpodArtist*> artist;
+	std::map<std::string, GpodArtist*> artists;
 	std::map<std::string, GpodAlbum*> albums;
 	Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle);
 	void process(std::function<void(int)> perCb);
@@ -58,6 +59,6 @@ public:
 protected:
 	void throwG(bool fatal);
 	std::string path;
-	std::function<void(GError*, bool)> errHandler;
+	std::function<void(GError*, bool)> errHandle;
 	GError *err;
 };
