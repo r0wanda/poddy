@@ -32,8 +32,6 @@ DiskDev::DiskDev(UDisksBlock *b, UDisksFilesystem *fs): dev(fs) {
 }
 
 std::vector<DiskDev*> finddev() {
-    g_type_init();
-
 	GError *err = nullptr;
     UDisksClient *client = udisks_client_new_sync(nullptr, &err);
 	//std::shared_ptr<UDisksClient> clPtr(client);

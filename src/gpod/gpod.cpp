@@ -79,3 +79,6 @@ Gpod::~Gpod() {
 		delete al.second;
 	}
 }
+
+void GpodArtwork::write(GpodTrack *tr) {
+}

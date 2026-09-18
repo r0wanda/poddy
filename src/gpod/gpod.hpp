@@ -11,12 +11,17 @@
 class GpodArtist;
 class GpodAlbum;
 
+class GpodArtwork {
+public:
+	struct Itdb_Artwork *art = nullptr;
+	void write(GpodTrack *tr);
+};
 class GpodTrack {
 public:
-	Gpod *gpod;
-	Itdb_Track *track;
-	GpodArtist *artist;
-	GpodAlbum *album;
+	Gpod *gpod = nullptr;
+	Itdb_Track *track = nullptr;
+	GpodArtist *artist = nullptr;
+	GpodAlbum *album = nullptr;
 	std::string title;
 	unsigned short playcount;
 	unsigned short recentPlaycount;
@@ -26,7 +31,7 @@ public:
 };
 class GpodAlbum {
 public:
-	GpodArtist *artist;
+	GpodArtist *artist = nullptr;
 	std::vector<GpodTrack*> tracks;
 	GpodAlbum(std::string n);
 };
@@ -45,7 +50,7 @@ public:
 
 class Gpod {
 public:
-	Itdb_iTunesDB *itdb;
+	Itdb_iTunesDB *itdb = nullptr;
 	std::vector<GpodTrack*> tracks;
 	std::map<std::string, GpodArtist*> artists;
 	std::map<std::string, GpodAlbum*> albums;
