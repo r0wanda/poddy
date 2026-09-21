@@ -8,16 +8,22 @@ add_executable(poddy)
 
 add_compile_options(-Wall -Wextra)
 
-if (UNIX)
-set(IS_LINUX 1)
-configure_file(src/config.h.in src/config.h)
+if (APPLE)
+add_compile_definitions("IS_MACOS")
+elseif (UNIX)
+add_compile_definitions("IS_LINUX")
+elseif (WIN32)
+add_compile_definitions("IS_WINDOWS")
 endif()
 
 target_sources(poddy
+	PUBLIC
+		src/config.hpp
     PRIVATE
-        src/main.cpp
+		src/config.cpp
 		src/poddy.cpp
 		src/poddy.hpp
+		src/main.cpp
 )
 
 add_subdirectory(external/ftxui)

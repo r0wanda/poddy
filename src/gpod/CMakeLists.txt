@@ -13,6 +13,9 @@ target_sources(GpodXX
 			finddev.hpp
 )
 
+target_include_directories(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
+target_link_libraries(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
+
 if (UNIX)
 find_package(PkgConfig REQUIRED)
 

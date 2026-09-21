@@ -15,9 +15,10 @@
                 "/usr/include/blkid",
                 "/usr/include/sysprof-6",
                 "${workspaceFolder}/build/_deps/ftxui-src/include",
-                "/usr/include/udisks2"
+                "/usr/include/udisks2",
+                "${workspaceFolder}/build/src"
             ],
-            "defines": [],
+            "defines": ["IS_LINUX"],
             "compilerPath": "/usr/bin/gcc"
         }
     ],

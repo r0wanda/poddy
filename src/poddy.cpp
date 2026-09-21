@@ -17,12 +17,12 @@ PoddyMain::PoddyMain() {
 	});
 }
 
-Poddy::Poddy(std::vector<PodMod> mods) {
+Poddy::Poddy(std::vector<PodMod> mods): findd() {
 	modules = mods;
 	tui = new Tui(modules);
-	gpod = new Gpod();
+	findIpod();
 }
 
 void Poddy::findIpod() {
-	tui->popup();
+	tui->popup(findd.popup);
 }

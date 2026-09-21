@@ -1,3 +1,0 @@
-#cmakedefine IS_LINUX
-#cmakedefine IS_WINDOWS
-#cmakedefine IS_MACOS

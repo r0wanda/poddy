@@ -8,8 +8,8 @@
 
 using namespace ftxui;
 
-Tui::Tui(std::vector<PodMod> _tabs): curTab(0), tabsC(), modules(_tabs), app(nullptr) {
-	std::vector<std::string> names;
+Tui::Tui(std::vector<PodMod> _tabs): app(nullptr), tabsC(), modules(_tabs), curTab(0) {
+	/*std::vector<std::string> names;
 	for (const PodMod &pm : modules) {
 		tabsC.push_back(pm.content);
 		names.push_back(pm.name);
@@ -27,12 +27,24 @@ Tui::Tui(std::vector<PodMod> _tabs): curTab(0), tabsC(), modules(_tabs), app(nul
 			separator(),
 			container->Render()
 		});
-	});
+	});*/
 	app = new App(App::FullscreenAlternateScreen());
-  	app->Loop(renderer);
+  	//app->Loop(renderer);
 }
-void Tui::popup() {
-
+void Tui::popup(ftxui::Component pop) {
+	auto renderer = Renderer(pop, [&] {
+    	return vbox({
+        	filler(),
+        	hbox({
+            	filler(),
+        		pop->Render() | border,
+              filler(),
+          }),
+          filler(),
+      });
+	});
+	app->Loop(renderer);
+	//std::getchar();
 }
 PodMod Tui::getCurTab() {
 	return modules[curTab];

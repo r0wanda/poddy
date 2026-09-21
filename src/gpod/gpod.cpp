@@ -4,8 +4,8 @@
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
 
-GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): title(tr->title), playcount() {}
-GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp) {
+GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): title(tr->title), playcount(), gpod(gp) {}
+GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): gpod(gp) {
 	TagLib::Tag *tag = ref.tag();
 	Itdb_Track *tr = itdb_track_new();
 	if (tag == NULL) {
@@ -16,7 +16,7 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp) {
 }
 
 Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle):
-path(dbPath), errHandle(errHandle), err(nullptr), tracks() {
+path(dbPath), errHandle(errHandle), tracks(), err(nullptr) {
     itdb = itdb_parse(path.c_str(), &err);
 	throwG(true);
 }
@@ -24,7 +24,7 @@ path(dbPath), errHandle(errHandle), err(nullptr), tracks() {
 void Gpod::process(std::function<void(int)> perCb) {
 	int per = 0;
 	perCb(per);
-	size_t trLen = g_list_length(itdb->tracks);
+	//size_t trLen = g_list_length(itdb->tracks);
 	GList *it;
 	for (it = itdb->tracks; it != NULL; it = it->next) {
 		Itdb_Track *tr = (Itdb_Track*)it->data;

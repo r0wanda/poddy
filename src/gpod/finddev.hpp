@@ -1,7 +1,10 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../config.h"
+#include <map>
+#include <ftxui/component/component.hpp>
+#include <ftxui/dom/elements.hpp>
+#include "../config.hpp"
 
 #ifdef IS_LINUX
 #include <memory>
@@ -14,23 +17,40 @@
  * macos: open finder window to select drive
  */
 
+class FindDev;
+
 class DiskDev {
 public:
+	std::string uuid;
 	std::string path;
 	std::string name;
-	std::string disp;
 	// 0 = prob 1 = maybe 2 = nah
-	char isIpod;
+	char isIpod = 2;
 	bool _discard;
 #ifdef IS_LINUX
-	//std::shared_ptr<UDisksClient> client;
 	UDisksFilesystem *dev;
-	DiskDev(UDisksBlock *b, UDisksFilesystem *fs);
+	DiskDev(UDisksBlock *b, UDisksFilesystem *fs, FindDev *fd);
 #endif
-	void connect(std::function<void(std::string)> cb);
+	std::string connect();
 	~DiskDev();
+private:
+	FindDev *findd;
 };
+typedef std::shared_ptr<DiskDev> DiskDevPtr;
 
-#ifdef IS_LINUX
-std::vector<DiskDev*> finddev();
-#endif
+class FindDev {
+public:
+	DiskDev *connected = nullptr;
+	std::vector<DiskDevPtr> devs;
+	FindDev();
+	void refresh();
+	ftxui::Component popup;
+	~FindDev();
+	friend class DiskDev;
+private:
+	GError *err;
+	UDisksClient *client;
+	GDBusObjectManager *manager;
+	ftxui::Component menu;
+	int menuSel;
+};

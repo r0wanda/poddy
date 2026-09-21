@@ -2,6 +2,7 @@
 #include <vector>
 #include "tui/tui.hpp"
 #include "gpod/gpod.hpp"
+#include "gpod/finddev.hpp"
 #include "podmod/podmod.hpp"
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
@@ -19,7 +20,8 @@ private:
 class Poddy {
 public:
 	Tui *tui;
-	Gpod *gpod;
+	Gpod *gpod = nullptr;
+	FindDev findd;
 	std::vector<PodMod> modules;
 	Poddy(std::vector<PodMod> mods);
 	void findIpod();

@@ -10,10 +10,12 @@
 
 class GpodArtist;
 class GpodAlbum;
+class GpodTrack;
+class Gpod;
 
 class GpodArtwork {
 public:
-	struct Itdb_Artwork *art = nullptr;
+	Itdb_Artwork *art = nullptr;
 	void write(GpodTrack *tr);
 };
 class GpodTrack {
