@@ -28,6 +28,7 @@ target_sources(poddy
 
 add_subdirectory(external/ftxui)
 add_subdirectory(external/curlpp)
+add_subdirectory(external/nlohmann)
 add_subdirectory(src/tui)
 add_subdirectory(src/gpod)
 

@@ -1,0 +1,6 @@
+- add option for external libraries
+- settings
+- external modules
+	- ytdl
+	- tidal
+	- curl
