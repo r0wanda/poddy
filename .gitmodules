@@ -7,3 +7,6 @@
 [submodule "external/libgpod"]
 	path = external/libgpod
 	url = https://github.com/fadingred/libgpod.git
+[submodule "external/nlohmann"]
+	path = external/nlohmann
+	url = https://github.com/nlohmann/json.git
