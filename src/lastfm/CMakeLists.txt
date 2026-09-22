@@ -1,23 +1,14 @@
 cmake_minimum_required(VERSION 3.23)
 
-add_library(GpodXX)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBGPOD REQUIRED libgpod-1.0)
+add_library(LastFm)
 
-target_sources(GpodXX
+target_sources(LastFm
 	PRIVATE
-		gpod.cpp
-		finddev.cpp
+		lastfm.cpp
 	PUBLIC
-		FILE_SET HEADERS
+		TYPE HEADERS
 		FILES
-			gpod.hpp
-			finddev.hpp
+			lastfm.hpp
 )
 
-
-
-#target_include_directories(GpodXX PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_include_directories(GpodXX PUBLIC ${LIBGPOD_INCLUDE_DIRS})
-target_compile_options(GpodXX PUBLIC ${LIBGPOD_CFLAGS_OTHER})
-target_link_libraries(GpodXX PRIVATE ${LIBGPOD_LIBRARIES})
+target_link_libraries(LastFm PRIVATE GpodXX)

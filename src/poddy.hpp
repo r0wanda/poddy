@@ -2,7 +2,7 @@
 #include <vector>
 #include "tui/tui.hpp"
 #include "gpod/gpod.hpp"
-#include "gpod/finddev.hpp"
+#include "finddev/finddev.hpp"
 #include "podmod/podmod.hpp"
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>

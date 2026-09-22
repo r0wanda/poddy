@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 #include <glib.h>
 #include <functional>
 #include <gpod/itdb.h>
@@ -13,12 +14,13 @@ class GpodAlbum;
 class GpodTrack;
 class Gpod;
 
-class GpodArtwork {
+class GpodArtwork : public std::enable_shared_from_this<GpodArtwork> {
 public:
 	Itdb_Artwork *art = nullptr;
 	void write(GpodTrack *tr);
+	std::shared_ptr<GpodArtwork> getPtr();
 };
-class GpodTrack {
+class GpodTrack : public std::enable_shared_from_this<GpodTrack> {
 public:
 	Gpod *gpod = nullptr;
 	Itdb_Track *track = nullptr;
@@ -31,20 +33,20 @@ public:
 	GpodTrack(Itdb_Track *tr, Gpod *gp);
 	GpodTrack(TagLib::FileRef ref, Gpod *gp);
 };
-class GpodAlbum {
+class GpodAlbum: public std::enable_shared_from_this<GpodAlbum> {
 public:
 	GpodArtist *artist = nullptr;
 	std::vector<GpodTrack*> tracks;
 	GpodAlbum(std::string n);
 };
-class GpodArtist {
+class GpodArtist: public std::enable_shared_from_this<GpodArtist> {
 public:
 	std::map<std::string, GpodAlbum*> albums;
 	std::vector<GpodTrack*> tracks;
 	std::string name;
 	GpodArtist(std::string n);
 };
-class GpodPlaylist {
+class GpodPlaylist: public std::enable_shared_from_this<GpodPlaylist> {
 public:
 
 	std::vector<GpodTrack*> tracks;
