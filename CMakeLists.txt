@@ -29,7 +29,10 @@ target_sources(poddy
 add_subdirectory(external/ftxui)
 add_subdirectory(external/curlpp)
 add_subdirectory(external/nlohmann)
+add_subdirectory(src/podmod)
+add_subdirectory(src/settings)
 add_subdirectory(src/tui)
 add_subdirectory(src/gpod)
+add_subdirectory(src/finddev)
 
-target_link_libraries(poddy PRIVATE PoddyTui GpodXX)
+target_link_libraries(poddy PRIVATE PodMod PoddySettings PoddyTui GpodXX FindDev)

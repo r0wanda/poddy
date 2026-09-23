@@ -4,10 +4,10 @@ add_library(PodMod)
 
 target_sources(PodMod
 	PRIVATE
-		podmod.cpp
+ 		podmod.cpp
 	PUBLIC
-		TYPE HEADERS
-		FILES
-			podmod.hpp
+		podmod.hpp
 )
 
+target_include_directories(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)
+target_link_libraries(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)

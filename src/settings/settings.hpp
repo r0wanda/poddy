@@ -1,5 +1,6 @@
 #pragma once
-#include "../podmod/podmod.h"
+#include <string>
+#include "../podmod/podmod.hpp"
 
 // abstract class that handles settings
 class PodSettings : public PodMod {
@@ -9,7 +10,7 @@ public:
 
 // module to edit settings
 class SettingsIface : public PodMod {
-
+public:
 private:
 	std::vector<std::shared_ptr<PodSettings>> insts;
 };

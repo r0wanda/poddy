@@ -4,10 +4,11 @@
 #include "gpod/gpod.hpp"
 #include "finddev/finddev.hpp"
 #include "podmod/podmod.hpp"
+#include "settings/settings.hpp"
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 
-class PoddyMain : public PodMod {
+class PoddyMain : public PodSettings {
 public:
 	PoddyMain();
 private:

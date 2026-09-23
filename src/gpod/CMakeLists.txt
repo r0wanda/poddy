@@ -6,9 +6,7 @@ target_sources(GpodXX
 	PRIVATE
 		gpod.cpp
 	PUBLIC
-		TYPE HEADERS
-		FILES
-			gpod.hpp
+		gpod.hpp
 )
 
 #target_include_directories(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)

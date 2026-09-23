@@ -4,8 +4,7 @@
 
 using namespace ftxui;
 
-PoddyMain::PoddyMain() {
-	name = "iPod";
+PoddyMain::PoddyMain(): PodSettings("iPod") {
 	content = Renderer(mainMenu, [&] {
 		return hbox({
 			controls->Render(),
@@ -17,9 +16,7 @@ PoddyMain::PoddyMain() {
 	});
 }
 
-Poddy::Poddy(std::vector<PodMod> mods): findd() {
-	modules = mods;
-	tui = new Tui(modules);
+Poddy::Poddy(std::vector<PodMod> mods): modules(mods), tui(new Tui(modules)), findd(tui) {
 	findIpod();
 }
 

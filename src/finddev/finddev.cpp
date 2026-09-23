@@ -1,14 +1,15 @@
 #include "finddev.hpp"
-#include "../config.hpp"
-#include <iostream>
+#include <regex>
 #include <string>
+#include <iostream>
+#include <algorithm>
 #include <ftxui/screen/color.hpp>
+#include "../config.hpp"
 
 #ifdef IS_LINUX
 #include <udisks/udisks.h>
 #include <glib.h>
-#include <regex>
-#include <algorithm>
+#endif
 
 bool searchIpod(std::string str) {
 	if (str.empty()) return false;
@@ -17,6 +18,7 @@ bool searchIpod(std::string str) {
 	return std::regex_search(str, rex);
 }
 
+#ifdef IS_LINUX
 DiskDev::DiskDev(UDisksBlock *b, UDisksFilesystem *fs, FindDev *fd): dev(fs), findd(fd) {
 	uuid = udisks_block_get_id_uuid(b);
 	path = udisks_block_get_device(b);
@@ -33,9 +35,42 @@ DiskDev::DiskDev(UDisksBlock *b, UDisksFilesystem *fs, FindDev *fd): dev(fs), fi
 	} else if (searchIpod(id) || searchIpod(_name)) isIpod = 0;
 	else isIpod = 1;
 }
+#endif
 
-FindDev::FindDev(): err(nullptr), menuSel(0) {
-	static const std::vector<std::string> icons{"✓", "?", "✕"};
+static void deviceChange(GDBusObjectManager *manager, GDBusObject *obj, gpointer data) {
+	FindDev *dev = static_cast<FindDev*>(data);
+	dev->refresh();
+}
+static void notifWorker(std::stop_token tok, FindDev *findd, Tui *tui) {
+	GMainContext *ctx = g_main_context_new();
+	g_main_context_push_thread_default(ctx);
+	GError *err = nullptr;
+	UDisksClient *client = udisks_client_new_sync(nullptr, &err);
+	GDBusObjectManager *manager = udisks_client_get_object_manager(client);
+	std::stop_callback cb(tok, [ctx] {
+		g_main_context_wakeup(ctx);
+	});
+	if (err != nullptr) {
+		tui->error(err->message);
+		g_error_free(err);
+		goto workerCleanup;
+	}
+
+	g_signal_connect(manager, "object-added", G_CALLBACK(deviceChange), findd);
+	g_signal_connect(manager, "object-removed", G_CALLBACK(deviceChange), findd);
+
+	while (!tok.stop_requested()) {
+		g_main_context_iteration(ctx, true);
+	}
+
+	workerCleanup:;
+	if (client) g_object_unref(client);
+	g_main_context_pop_thread_default(ctx);
+	g_main_context_unref(ctx);
+}
+
+FindDev::FindDev(Tui *_tui): tui(_tui), err(nullptr), menuSel(0) {
+#ifdef IS_LINUX
     client = udisks_client_new_sync(nullptr, &err);
     
     if (err != nullptr) {
@@ -45,8 +80,35 @@ FindDev::FindDev(): err(nullptr), menuSel(0) {
     }
 
     manager = udisks_client_get_object_manager(client);
+#endif
 	refresh();
+	start();
 
+	using namespace ftxui;
+	
+	popup = Renderer(menu, [&] {
+		return vbox({
+			hbox({text(devs[menuSel]->name) | bold}),
+			menu->Render() | frame | size(HEIGHT, LESS_THAN, 10)
+		});
+	});
+
+	popup |= CatchEvent([&](Event ev) {
+		if (ev == Event::Return) {
+			std::string msg = "Connecting to " + devs[menuSel]->name;
+			Render(*tui->app, text(msg) | size(HEIGHT, EQUAL, 5) | size(WIDTH, EQUAL, msg.size() + 2) | border);
+			tui->app->Print();
+			devs[menuSel]->connect();
+			tui->app->ExitLoopClosure()();
+			return true;
+		}
+		return false;
+	});
+}
+
+void FindDev::setupPopup() {
+	menuSel = std::min(menuSel, (int)devs.size() - 1);
+	static const std::vector<std::string> icons{"✓", "?", "✕"};
 	using namespace ftxui;
 	Components ents;
 	for (DiskDevPtr &dd : devs) {
@@ -64,13 +126,13 @@ FindDev::FindDev(): err(nullptr), menuSel(0) {
 			case 1:
 				e = hbox({
 					e, text(" "),
-					text(icons[1]) | (st.focused ? bgcolor(Color::Yellow) : color(Color::Yellow))
+					text(icons[1]) | color(Color::Yellow)
 				});
 				break;
 			default:
 				e = hbox({
 					e, text(" "),
-					text(icons[2]) | (st.focused ? bgcolor(Color::Red) : color(Color::Red))
+					text(icons[2])
 				});
 				if (!st.focused) e |= color(Color::GrayDark);
 			}
@@ -81,14 +143,18 @@ FindDev::FindDev(): err(nullptr), menuSel(0) {
 		ents.push_back(MenuEntry(txt, opt));
 	}
 	menu = Container::Vertical(ents, &menuSel);
-	popup = Renderer(menu, [&] {
-		return vbox({
-			hbox({text(devs[menuSel]->name) | bold}),
-			menu->Render() | frame | size(HEIGHT, LESS_THAN, 10)
-		});
-	});
 }
+
+void FindDev::start() {
+	notifLoop = std::jthread(notifWorker, this, tui);
+}
+
+void FindDev::stop() {
+	notifLoop.request_stop();
+}
+
 void FindDev::refresh() {
+#ifdef IS_LINUX
 	std::map<std::string, DiskDevPtr> ndevs;
 	GList *objects = g_dbus_object_manager_get_objects(manager);
 
@@ -119,24 +185,24 @@ void FindDev::refresh() {
 		devs.push_back(dd.second);
 	}
     g_list_free_full(objects, g_object_unref);
+#endif
 	std::sort(devs.begin(), devs.end(), [](DiskDevPtr const &a, DiskDevPtr const &b) {
 		return a->isIpod < b->isIpod;
 	});
+	setupPopup();
 }
 
 FindDev::~FindDev() {
+#ifdef IS_LINUX
 	g_object_unref(client);
+#endif
 	for (auto &dd : devs) {
 		dd.reset();
 	}
 }
 
-struct LoopCb {
-	GMainLoop *loop;
-	std::function<void(std::string)> *cb;
-};
-
 std::string DiskDev::connect() {
+#ifdef IS_LINUX
 	const gchar *const *mp = udisks_filesystem_get_mount_points(dev);
 	if (mp != nullptr) {
 		if (mp[0] != nullptr) return std::string(mp[0]);
@@ -157,17 +223,18 @@ std::string DiskDev::connect() {
         g_clear_error(&err);
 		return "";
 	}
+#endif
 	findd->connected = this;
 	return mnt;
 }
 
 DiskDev::~DiskDev() {
+#ifdef IS_LINUX
 	g_object_unref(dev);
+#endif
 	if (findd->connected == this) findd->connected = nullptr;
 	//if (client.unique()) g_object_unref(client.get());
 }
-
-#endif
 
 /*int main() {
 	FindDev findd;

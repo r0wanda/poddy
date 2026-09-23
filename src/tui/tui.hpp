@@ -16,6 +16,7 @@ public:
 	std::vector<PodMod> modules;
 	Tui(std::vector<PodMod> _tabs);
 	void popup(ftxui::Component pop);
+	void error(std::string err, bool fatal = false);
 	PodMod getCurTab();
 private:
 	int curTab;

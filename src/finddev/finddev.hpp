@@ -1,14 +1,15 @@
 #pragma once
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
+#include <memory>
+#include <thread>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 #include "../config.hpp"
+#include "../tui/tui.hpp"
 
 #ifdef IS_LINUX
-#include <memory>
-#include <functional>
 #include <udisks/udisks.h>
 #endif
 
@@ -42,15 +43,23 @@ class FindDev {
 public:
 	DiskDev *connected = nullptr;
 	std::vector<DiskDevPtr> devs;
-	FindDev();
+	FindDev(Tui *_tui);
+	void start();
+	void stop();
 	void refresh();
 	ftxui::Component popup;
 	~FindDev();
 	friend class DiskDev;
 private:
+#ifdef IS_LINUX
 	GError *err;
 	UDisksClient *client;
 	GDBusObjectManager *manager;
+#endif
+	Tui *tui;
 	ftxui::Component menu;
+	ftxui::Element connectDialog;
 	int menuSel;
+	std::jthread notifLoop;
+	void setupPopup();
 };

@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -10,13 +11,18 @@ bool startConfig() {
 		if (!fs::exists(cacheDir)) {
 			fs::create_directory(cacheDir);
 		}
-	} else return false;
+	} else goto sConfigE;
 	if (std::getenv("XDG_CONFIG_HOME") != NULL) {
 		configDir = fs::path(std::getenv("XDG_CONFIG_HOME")) / "poddy";
 		if (!fs::exists(configDir)) {
 			fs::create_directory(configDir);
 		}
-	} else return false;
+	} else goto sConfigE;
+	confReady = true;
 	return true;
+	sConfigE:;
+	std::cerr << "$XDG_*_HOME environment variables not found" << std::endl;
+	return false;
 }
+
 #endif

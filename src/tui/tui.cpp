@@ -38,13 +38,22 @@ void Tui::popup(ftxui::Component pop) {
         	hbox({
             	filler(),
         		pop->Render() | border,
-              filler(),
-          }),
-          filler(),
-      });
+            	filler(),
+        	}),
+        	filler(),
+    	});
 	});
 	app->Loop(renderer);
 	//std::getchar();
+}
+void Tui::error(std::string err, bool fatal) {
+	auto renderer = Renderer(*app, vbox({
+		text("Error") | hcenter,
+		text(err) | size(HEIGHT, EQUAL, 5) | size(WIDTH, EQUAL, err.size() + 2) | border,
+		text("Press anything to " + (fatal ? "exit" : "dismiss"))
+	}) | size(HEIGHT, GREATER_THAN, 5) | size(WIDTH, GREATER_THAN, err.size() + 2) | border | center);
+	app->Print();
+	if (fatal) exit(1);
 }
 PodMod Tui::getCurTab() {
 	return modules[curTab];
