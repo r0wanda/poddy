@@ -20,44 +20,55 @@ public:
 	void write(GpodTrack *tr);
 	std::shared_ptr<GpodArtwork> getPtr();
 };
+typedef std::shared_ptr<GpodArtwork> GpodArtworkPtr;
+
 class GpodTrack : public std::enable_shared_from_this<GpodTrack> {
 public:
 	Gpod *gpod = nullptr;
 	Itdb_Track *track = nullptr;
-	GpodArtist *artist = nullptr;
-	GpodAlbum *album = nullptr;
+	GpodArtistPtr artist;
+	GpodAlbumPtr album;
 	std::string title;
 	unsigned short playcount;
 	unsigned short recentPlaycount;
 	unsigned long ts;
 	GpodTrack(Itdb_Track *tr, Gpod *gp);
 	GpodTrack(TagLib::FileRef ref, Gpod *gp);
+	std::shared_ptr<GpodTrack> getPtr();
 };
-class GpodAlbum: public std::enable_shared_from_this<GpodAlbum> {
+typedef std::shared_ptr<GpodTrack> GpodTrackPtr;
+
+class GpodAlbum : public std::enable_shared_from_this<GpodAlbum> {
 public:
-	GpodArtist *artist = nullptr;
-	std::vector<GpodTrack*> tracks;
+	GpodArtistPtr artist;
+	std::vector<GpodTrackPtr> tracks;
 	GpodAlbum(std::string n);
+	std::string title;
+	std::shared_ptr<GpodAlbum> getPtr();
 };
-class GpodArtist: public std::enable_shared_from_this<GpodArtist> {
+typedef std::shared_ptr<GpodAlbum> GpodAlbumPtr;
+
+class GpodArtist : public std::enable_shared_from_this<GpodArtist> {
 public:
-	std::map<std::string, GpodAlbum*> albums;
-	std::vector<GpodTrack*> tracks;
+	std::map<std::string, GpodAlbumPtr> albums;
+	std::vector<GpodTrackPtr> tracks;
 	std::string name;
 	GpodArtist(std::string n);
+	std::shared_ptr<GpodArtist> getPtr();
 };
-class GpodPlaylist: public std::enable_shared_from_this<GpodPlaylist> {
-public:
+typedef std::shared_ptr<GpodArtist> GpodArtistPtr;
 
-	std::vector<GpodTrack*> tracks;
+class GpodPlaylist : public std::enable_shared_from_this<GpodPlaylist> {
+public:
+	std::vector<GpodTrackPtr> tracks;
 };
 
 class Gpod {
 public:
 	Itdb_iTunesDB *itdb = nullptr;
-	std::vector<GpodTrack*> tracks;
-	std::map<std::string, GpodArtist*> artists;
-	std::map<std::string, GpodAlbum*> albums;
+	std::vector<GpodTrackPtr> tracks;
+	std::map<std::string, GpodArtistPtr> artists;
+	std::vector<GpodAlbumPtr> albums;
 	Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle);
 	void process(std::function<void(int)> perCb);
 	~Gpod();

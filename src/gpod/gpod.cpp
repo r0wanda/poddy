@@ -1,6 +1,7 @@
 #include "gpod.hpp"
-#include <iostream>
 #include <thread>
+#include <memory>
+#include <iostream>
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
 
@@ -28,7 +29,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 	GList *it;
 	for (it = itdb->tracks; it != NULL; it = it->next) {
 		Itdb_Track *tr = (Itdb_Track*)it->data;
-		GpodTrack *gt = new GpodTrack(tr, this);
+		GpodTrackPtr gt = std::make_shared<GpodTrack>(tr, this);
 		std::string arName(tr->artist);
 		std::string alName(tr->album);
 
@@ -36,27 +37,28 @@ void Gpod::process(std::function<void(int)> perCb) {
 		tracks.push_back(gt);
 
 		// find or create artist
-		GpodArtist *artist;
+		GpodArtistPtr artist;
 		if (artists.find(arName) == artists.end()) {
-			artist = new GpodArtist(arName);
+			artist = std::make_shared<GpodArtist>(arName);
 			artists[arName] = artist;
 		} else {
 			artist = artists.at(arName);
 		}
-		artist->tracks.push_back(gt);
-		gt->artist = artist;
+		artist->tracks.push_back(gt->getPtr());
+		gt->artist = artist->getPtr();
 
 		// add album to artist, synchronise everything
-		GpodAlbum *album;
+		GpodAlbumPtr album;
 		if (artist->albums.find(alName) == artist->albums.end()) {
-			album = new GpodAlbum(alName);
+			album = std::make_shared<GpodAlbum>(alName);
 			artist->albums[alName] = album;
 		} else {
 			album = artist->albums.at(alName);
 		}
+		albums.push_back(album->getPtr());
 		album->tracks.push_back(gt);
 		album->artist = artist;
-		gt->album = album;
+		gt->album = album->getPtr();
 	}
 }
 
@@ -70,13 +72,13 @@ void Gpod::throwG(bool fatal) {
 Gpod::~Gpod() {
 	itdb_free(itdb);
 	for (auto &tr : tracks) {
-		delete tr;
+		tr.reset();
 	}
 	for (auto &ar : artists) {
-		delete ar.second;
+		tr.second.reset();
 	}
 	for (auto &al : albums) {
-		delete al.second;
+		al.reset();
 	}
 }
 
