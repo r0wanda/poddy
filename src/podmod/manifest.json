@@ -1,0 +1,9 @@
+{
+	"url": "https://github.com/r0wanda/poddy/raw/refs/heads/main/src/podmod/manifest.json",
+	"version": "1.0.0",
+	"zip": "https://github.com/r0wanda/poddy/archive/refs/heads/main.zip",
+	"__note": "",
+	"website": "https://github.com/r0wanda/poddy",
+	"name": "poddy",
+	"description": "example manifest"
+}

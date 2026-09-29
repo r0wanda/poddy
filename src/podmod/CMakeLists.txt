@@ -5,6 +5,8 @@ add_library(PodMod)
 target_sources(PodMod
 	PRIVATE
  		podmod.cpp
+		${PROJECT_SOURCE_DIR}/external/miniz/miniz.c
+		${PROJECT_SOURCE_DIR}/external/miniz/miniz.h
 	PUBLIC
 		podmod.hpp
 )
