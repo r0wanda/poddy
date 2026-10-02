@@ -6,13 +6,19 @@
 #include <ftxui/dom/elements.hpp>
 #include "../poddy.hpp"
 
-class PodMod {
+class IndepPodMod {
 public:
-	ftxui::Component content;
 	std::string name;
-	PodMod(std::string _name, Poddy *pod);
+	IndepPodMod(std::string _name);
 protected:
 	std::filesystem::path configPath;
 	std::filesystem::path cachePath;
+};
+
+class PodMod : public IndepPodMod {
+public:
+	ftxui::Component content;
+	PodMod(std::string _name, Poddy *pod);
+protected:
 	Poddy *poddy;
 };
