@@ -11,10 +11,13 @@
 class PoddyMain : public PodSettings {
 public:
 	PoddyMain();
+	void loadMainMenu();
 private:
 	int selected;
 	ftxui::Component controls;
+
 	ftxui::Component mainMenu;
+
 	ftxui::Component info;
 };
 

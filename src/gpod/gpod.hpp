@@ -14,7 +14,12 @@ class GpodAlbum;
 class GpodTrack;
 class Gpod;
 
-class GpodArtwork : public std::enable_shared_from_this<GpodArtwork> {
+class GpodBase : public std::enable_shared_from_this<GpodBase> {
+public:
+	virtual std::shared_ptr<GpodBase> getBasePtr();
+}
+
+class GpodArtwork : public GpodBase {
 public:
 	Itdb_Artwork *art = nullptr;
 	void write(GpodTrack *tr);

@@ -5,6 +5,16 @@
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
 
+// define shared pointer getter for a class deriving from enable_shared_from_this
+#define SHARED(C) std::shared_ptr<C> C::getPtr() { return std::dynamic_pointer_cast<C>(shared_from_this()); }
+
+std::shared_ptr<GpodBase> GpodBase::getBasePtr();
+SHARED(GpodTrack)
+SHARED(GpodAlbum)
+SHARED(GpodArtist)
+SHARED(GpodPlaylist)
+SHARED(GpodArtwork)
+
 GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): title(tr->title), playcount(), gpod(gp) {}
 GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): gpod(gp) {
 	TagLib::Tag *tag = ref.tag();
@@ -84,3 +94,5 @@ Gpod::~Gpod() {
 
 void GpodArtwork::write(GpodTrack *tr) {
 }
+
+#undef SHARED
