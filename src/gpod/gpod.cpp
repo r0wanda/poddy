@@ -5,18 +5,17 @@
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
 
-// define shared pointer getter for a class deriving from enable_shared_from_this
-#define SHARED(C) std::shared_ptr<C> C::getPtr() { return std::dynamic_pointer_cast<C>(shared_from_this()); }
+GpodBasePtr GpodBase::getBasePtr() {
+	return shared_from_this();
+}
 
-std::shared_ptr<GpodBase> GpodBase::getBasePtr();
-SHARED(GpodTrack)
-SHARED(GpodAlbum)
-SHARED(GpodArtist)
-SHARED(GpodPlaylist)
-SHARED(GpodArtwork)
+GpodBase::GpodBase(Gpod *gp): name("untitled"), gpod(gp) {
+}
+GpodBase::GpodBase(std::string nm, Gpod *gp): name(nm), gpod(gp) {
+}
 
-GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): title(tr->title), playcount(), gpod(gp) {}
-GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): gpod(gp) {
+GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): GpodBase::GpodBase(tr->title, gp), playcount() {}
+GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
 	TagLib::Tag *tag = ref.tag();
 	Itdb_Track *tr = itdb_track_new();
 	if (tag == NULL) {
@@ -24,6 +23,9 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): gpod(gp) {
 		gp->throwG(g_error_new(G_FILE_ERROR, 1, "file has no tags"));
 		return;
 	}
+}
+
+GpodAlbum::GpodAlbum(std::string n): GpodBase::GpodBase(n) {
 }
 
 Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle):

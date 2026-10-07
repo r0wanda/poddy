@@ -22,13 +22,24 @@ void PoddyMain::loadMainMenu() {
 		"Albums",
 		"Artists",
 		"Playlists",
-		"Songs"
+		"Tracks"
 	};
 	static Toggle mainMenuToggle = Toggle(&tabVals, &menuToggleSel);
 	static Component container = Container::tab();
-	std::vector<std::string> menuEnts;
+	std::vector<GpodBase> menuEnts;
 	switch (menuToggleSel) {
-		
+	case 0:
+		menuEnts = std::vector<GpodBase>(gpod->albums.begin(), gpod->albums.end());
+		break;
+	case 1:
+		menuEnts = std::vector<GpodBase>(gpod->artists.begin(), gpod->artists.end());
+		break;
+	case 2:
+		menuEnts = std::vector<GpodBase>(gpod->playlists.begin(), gpod->playlists.end());
+		break;
+	case 3:
+		menuEnts = std::vector<GpodBase>(gpod->tracks.begin(), gpod->tracks.end());
+		break;
 	}
 	auto menu = 
 }

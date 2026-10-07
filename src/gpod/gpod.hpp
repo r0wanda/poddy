@@ -9,6 +9,7 @@
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
 
+
 class GpodArtist;
 class GpodAlbum;
 class GpodTrack;
@@ -16,57 +17,61 @@ class Gpod;
 
 class GpodBase : public std::enable_shared_from_this<GpodBase> {
 public:
-	virtual std::shared_ptr<GpodBase> getBasePtr();
+	GpodBase(Gpod *gp);
+	GpodBase(std::string nm, Gpod *gp);
+	std::string name;
+	std::shared_ptr<GpodBase> getBasePtr();
+private:
+	Gpod *gpod = nullptr;
 }
+typedef std::shared_ptr<GpodBase> GpodBasePtr;
+#define GPODBASEPTR_CAST(b, C) std::dynamic_pointer_cast<C>(b.getBasePtr());
 
 class GpodArtwork : public GpodBase {
 public:
 	Itdb_Artwork *art = nullptr;
 	void write(GpodTrack *tr);
-	std::shared_ptr<GpodArtwork> getPtr();
 };
 typedef std::shared_ptr<GpodArtwork> GpodArtworkPtr;
+#define GPODARTWORK(b) GPODBASEPTR_CAST(b, GpodArtwork)
 
-class GpodTrack : public std::enable_shared_from_this<GpodTrack> {
+class GpodTrack : public GpodBase {
 public:
-	Gpod *gpod = nullptr;
 	Itdb_Track *track = nullptr;
 	GpodArtistPtr artist;
 	GpodAlbumPtr album;
-	std::string title;
 	unsigned short playcount;
 	unsigned short recentPlaycount;
 	unsigned long ts;
 	GpodTrack(Itdb_Track *tr, Gpod *gp);
 	GpodTrack(TagLib::FileRef ref, Gpod *gp);
-	std::shared_ptr<GpodTrack> getPtr();
 };
 typedef std::shared_ptr<GpodTrack> GpodTrackPtr;
+#define GPODTRACK(b) GPODBASEPTR_CAST(b, GpodTrack)
 
-class GpodAlbum : public std::enable_shared_from_this<GpodAlbum> {
+class GpodAlbum : public GpodBase {
 public:
 	GpodArtistPtr artist;
 	std::vector<GpodTrackPtr> tracks;
 	GpodAlbum(std::string n);
-	std::string title;
-	std::shared_ptr<GpodAlbum> getPtr();
 };
 typedef std::shared_ptr<GpodAlbum> GpodAlbumPtr;
+#define GPODALBUM(b) GPODBASEPTR_CAST(b, GpodAlbum)
 
-class GpodArtist : public std::enable_shared_from_this<GpodArtist> {
+class GpodArtist : public GpodBase {
 public:
 	std::map<std::string, GpodAlbumPtr> albums;
 	std::vector<GpodTrackPtr> tracks;
-	std::string name;
 	GpodArtist(std::string n);
-	std::shared_ptr<GpodArtist> getPtr();
 };
 typedef std::shared_ptr<GpodArtist> GpodArtistPtr;
+#define GPODARTIST(b) GPODBASEPTR_CAST(b, GpodArtist)
 
-class GpodPlaylist : public std::enable_shared_from_this<GpodPlaylist> {
+class GpodPlaylist : public GpodBase {
 public:
 	std::vector<GpodTrackPtr> tracks;
 };
+#define GPODPLAYLIST(b) GPODBASEPTR_CAST(b, GpodPlaylist)
 
 class Gpod {
 public:
