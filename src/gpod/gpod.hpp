@@ -20,6 +20,7 @@ public:
 	GpodBase(Gpod *gp);
 	GpodBase(std::string nm, Gpod *gp);
 	std::string name;
+	virtual explicit operator std::string() const;
 	std::shared_ptr<GpodBase> getBasePtr();
 private:
 	Gpod *gpod = nullptr;
@@ -45,6 +46,7 @@ public:
 	unsigned long ts;
 	GpodTrack(Itdb_Track *tr, Gpod *gp);
 	GpodTrack(TagLib::FileRef ref, Gpod *gp);
+	virtual explicit operator std::string() const;
 };
 typedef std::shared_ptr<GpodTrack> GpodTrackPtr;
 #define GPODTRACK(b) GPODBASEPTR_CAST(b, GpodTrack)
@@ -54,6 +56,7 @@ public:
 	GpodArtistPtr artist;
 	std::vector<GpodTrackPtr> tracks;
 	GpodAlbum(std::string n);
+	virtual explicit operator std::string() const;
 };
 typedef std::shared_ptr<GpodAlbum> GpodAlbumPtr;
 #define GPODALBUM(b) GPODBASEPTR_CAST(b, GpodAlbum)
@@ -63,6 +66,7 @@ public:
 	std::map<std::string, GpodAlbumPtr> albums;
 	std::vector<GpodTrackPtr> tracks;
 	GpodArtist(std::string n);
+	virtual explicit operator std::string() const;
 };
 typedef std::shared_ptr<GpodArtist> GpodArtistPtr;
 #define GPODARTIST(b) GPODBASEPTR_CAST(b, GpodArtist)

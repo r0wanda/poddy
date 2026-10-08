@@ -13,6 +13,9 @@ GpodBase::GpodBase(Gpod *gp): name("untitled"), gpod(gp) {
 }
 GpodBase::GpodBase(std::string nm, Gpod *gp): name(nm), gpod(gp) {
 }
+virtual explicit GpodBase::operator std::string() const {
+	return name;
+}
 
 GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): GpodBase::GpodBase(tr->title, gp), playcount() {}
 GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
@@ -25,7 +28,15 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
 	}
 }
 
+virtual explicit GpodTrack::operator std::string() const {
+	return artist->name + " - " + name;
+}
+
 GpodAlbum::GpodAlbum(std::string n): GpodBase::GpodBase(n) {
+}
+
+virtual explicit GpodAlbum::operator std::string() const {
+	return artist->name + " - " + name;
 }
 
 Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle):

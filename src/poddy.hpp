@@ -17,6 +17,8 @@ private:
 	ftxui::Component controls;
 
 	ftxui::Component mainMenu;
+	void menuEntryOpt();
+	GpodBasePtr currentItem;
 
 	ftxui::Component info;
 };
