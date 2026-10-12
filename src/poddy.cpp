@@ -1,4 +1,5 @@
 #include "poddy.hpp"
+#include <span>
 #include <vector>
 #include <string>
 #include <ftxui/component/component.hpp>
@@ -35,41 +36,55 @@ MenuEntryOption PoddyMain::menuEntryOpt(int i, const std::vector<GpodBasePtr> &m
 }
 
 void PoddyMain::loadMainMenu() {
+	// selectors
 	static int menuToggleSel = 0;
 	static int menuSel;
+	static int menuSortSel;
 	menuSel = 0;
-	static const std::vector<std::string> tabVals{
+	menuSortSel = 0;
+
+	// menu settings
+	static constexpr std::vector<std::string> tabVals{
 		"Albums",
 		"Artists",
 		"Playlists",
 		"Tracks"
 	};
+	// backwards alphabetical
 	static bool azBackwards = false;
-	std::vector<std::string> sortVals{"Name", "Artist", "Release Date", "Recently Played"};
+	static constexpr std::span<const std::string> _sortVals{"Artist", "Name", "Release Date", "Recently Played"};
+	std::span<const std::string> sortVals;
+
+	// menu settings components
 	static Toggle mainMenuToggle = Toggle(&tabVals, &menuToggleSel);
 	static Component container = Container::Tab();
 	std::vector<MenuEntry> menuEnts;
 	std::vector<GpodBasePtr> menuItems;
 
-	menuEnts.push_back(mainMenuToggle);
-	menuEnts.push_back(Renderer([] { return separator(); }));
-
 	switch (menuToggleSel) {
 	case 0:
 		menuItems = std::vector<GpodBasePtr>(gpod->albums.begin(), gpod->albums.end());
+		sortVals = _sortVals;
 		break;
 	case 1:
 		menuItems = std::vector<GpodBasePtr>(gpod->artists.begin(), gpod->artists.end());
-		sortVals.erase(sortVals.begin() + 1);
+		sortVals = _sortVals.subspan(1);
 		break;
 	case 2:
 		menuItems = std::vector<GpodBasePtr>(gpod->playlists.begin(), gpod->playlists.end());
-		sortVals.erase(sortvals.begin() + 1, sortVals.begin() + 3);
+		sortVals = _sortVals.subspan(1);
 		break;
 	case 3:
 		menuItems = std::vector<GpodBasePtr>(gpod->tracks.begin(), gpod->tracks.end());
 		break;
 	}
+	auto menuSortDD = Dropdown(&sortVals, )
+	auto menuToggleCont = Container::Horizontal({
+		mainMenuToggle,
+	});
+	menuEnts.push_back();
+	menuEnts.push_back(Renderer([] { return separator(); }));
+
 	for (GpodBasePtr &base : menuItems) {
 		menuEnts.push_back(MenuEntry(base->name, menuEntryOpt));
 	}

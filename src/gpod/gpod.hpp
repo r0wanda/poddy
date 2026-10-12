@@ -14,6 +14,11 @@ class GpodAlbum;
 class GpodTrack;
 class Gpod;
 
+/**
+ * @brief utility 
+ * 
+ * @tparam T 
+ */
 template <typename T>
 class SharedPtrGet : public std::enable_shared_from_this<T> {
 public:

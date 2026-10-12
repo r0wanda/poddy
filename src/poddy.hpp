@@ -8,6 +8,10 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 
+/**
+ * @brief ipod interface window
+ * 
+ */
 class PoddyMain : public PodSettings {
 public:
 	PoddyMain();
