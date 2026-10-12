@@ -1,5 +1,5 @@
 #pragma once
-#include "../podmod/podmod.hpp"
+#include <podmod.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/app.hpp>
 #include <ftxui/dom/elements.hpp>

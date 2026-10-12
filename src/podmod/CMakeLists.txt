@@ -5,11 +5,12 @@ add_library(PodMod)
 target_sources(PodMod
 	PRIVATE
  		podmod.cpp
-		${PROJECT_SOURCE_DIR}/external/miniz/miniz.c
-		${PROJECT_SOURCE_DIR}/external/miniz/miniz.h
 	PUBLIC
-		podmod.hpp
+		FILE_SET podmodheaders
+		TYPE HEADERS
+		FILES
+			podmod.hpp
 )
 
-target_include_directories(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)
+#target_include_directories(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)
+target_link_libraries(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component miniz)

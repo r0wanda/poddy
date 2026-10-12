@@ -1,5 +1,5 @@
-#include "../tui/tui.hpp"
-#include "../podmod/podmod.hpp"
+#include <tui.hpp>
+#include <podmod.hpp>
 #include <vector>
 #include <string>
 #include <ftxui/component/component.hpp>

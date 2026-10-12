@@ -3,8 +3,8 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include "cache.hpp"
-#include "../gpod/gpod.hpp"
-#include "../settings/settings.hpp"
+#include <gpod.hpp>
+#include <settings.hpp>
 
 class Lastfm : public PodSettings {
 public:

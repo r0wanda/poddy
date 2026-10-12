@@ -6,6 +6,7 @@ target_sources(LastFm
 	PRIVATE
 		lastfm.cpp
 	PUBLIC
+		FILE_SET lastfmheaders
 		TYPE HEADERS
 		FILES
 			lastfm.hpp

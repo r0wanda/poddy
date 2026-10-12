@@ -26,6 +26,7 @@ target_sources(poddy
 		src/main.cpp
 )
 
+add_subdirectory(external/miniz)
 add_subdirectory(external/ftxui)
 add_subdirectory(external/curlpp)
 add_subdirectory(external/nlohmann)

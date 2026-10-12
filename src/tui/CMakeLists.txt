@@ -6,12 +6,12 @@ target_sources(PoddyTui
 	PRIVATE
 		tui.cpp
 	PUBLIC
-		FILE_SET headers
+		FILE_SET tuiheaders
 		TYPE HEADERS
 		FILES
 			tui.hpp
 )
 
 #target_include_directories(PoddyTui PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_include_directories(PoddyTui PUBLIC ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(PoddyTui PUBLIC ftxui::screen ftxui::dom ftxui::component)
+#target_include_directories(PoddyTui PUBLIC ftxui::screen ftxui::dom ftxui::component)
+target_link_libraries(PoddyTui PUBLIC ftxui::screen ftxui::dom ftxui::component PodMod)

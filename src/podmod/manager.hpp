@@ -2,8 +2,8 @@
 #include <vector>
 #include <string>
 #include <filesystem>
-#include "podmod.hpp"
-#include "../settings/settings.hpp"
+#include <podmod.hpp>
+#include <settings.hpp>
 #ifdef IS_LINUX
 #include <dlfcn.h>
 #endif

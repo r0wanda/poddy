@@ -7,7 +7,7 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 #include "../config.hpp"
-#include "../tui/tui.hpp"
+#include <tui.hpp>
 
 #ifdef IS_LINUX
 #include <udisks/udisks.h>

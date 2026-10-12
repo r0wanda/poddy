@@ -6,7 +6,10 @@ target_sources(FindDev
 	PRIVATE
 		finddev.cpp
 	PUBLIC
-		finddev.hpp
+		FILE_SET finddevheaders
+		TYPE HEADERS
+		FILES
+			finddev.hpp
 )
 
 if (UNIX)
@@ -19,5 +22,5 @@ target_compile_options(FindDev PRIVATE ${LIBUDISKS_CFLAGS_OTHER})
 target_link_libraries(FindDev PRIVATE ${LIBUDISKS_LIBRARIES})
 endif()
 
-target_include_directories(FindDev PRIVATE ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(FindDev PRIVATE ftxui::screen ftxui::dom ftxui::component)
+#target_include_directories(FindDev PRIVATE ftxui::screen ftxui::dom ftxui::component)
+target_link_libraries(FindDev PRIVATE ftxui::screen ftxui::dom ftxui::component PoddyTui)

@@ -13,7 +13,7 @@
 #include <curlpp/Options.hpp>
 #include "lastfm.hpp"
 #include "cache.hpp"
-#include "../gpod/gpod.hpp"
+#include <gpod.hpp>
 #define GERROR(e, fatal) if (e) { if (e->message) std::cerr << e->message; g_error_free(e); e = NULL; if (fatal) return 1; }
 
 struct LastFmSettings {

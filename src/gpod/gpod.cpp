@@ -13,7 +13,8 @@ GpodBase::GpodBase(Gpod *gp): name("untitled"), gpod(gp) {
 }
 GpodBase::GpodBase(std::string nm, Gpod *gp): name(nm), gpod(gp) {
 }
-virtual explicit GpodBase::operator std::string() const {
+
+GpodBase::operator std::string() const {
 	return name;
 }
 
@@ -28,19 +29,19 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
 	}
 }
 
-virtual explicit GpodTrack::operator std::string() const {
+GpodTrack::operator std::string() const {
 	return artist->name + " - " + name;
 }
 
-GpodAlbum::GpodAlbum(std::string n): GpodBase::GpodBase(n) {
+GpodAlbum::GpodAlbum(std::string n, Gpod *gp): GpodBase::GpodBase(n, gp) {
 }
 
-virtual explicit GpodAlbum::operator std::string() const {
+GpodAlbum::operator std::string() const {
 	return artist->name + " - " + name;
 }
 
-Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errHandle):
-path(dbPath), errHandle(errHandle), tracks(), err(nullptr) {
+Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errH):
+path(dbPath), errHandle(errH), tracks(), err(nullptr) {
     itdb = itdb_parse(path.c_str(), &err);
 	throwG(true);
 }
@@ -62,7 +63,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 		// find or create artist
 		GpodArtistPtr artist;
 		if (artists.find(arName) == artists.end()) {
-			artist = std::make_shared<GpodArtist>(arName);
+			artist = std::make_shared<GpodArtist>(arName, this);
 			artists[arName] = artist;
 		} else {
 			artist = artists.at(arName);
@@ -73,7 +74,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 		// add album to artist, synchronise everything
 		GpodAlbumPtr album;
 		if (artist->albums.find(alName) == artist->albums.end()) {
-			album = std::make_shared<GpodAlbum>(alName);
+			album = std::make_shared<GpodAlbum>(alName, this);
 			artist->albums[alName] = album;
 		} else {
 			album = artist->albums.at(alName);
@@ -98,7 +99,7 @@ Gpod::~Gpod() {
 		tr.reset();
 	}
 	for (auto &ar : artists) {
-		tr.second.reset();
+		ar.second.reset();
 	}
 	for (auto &al : albums) {
 		al.reset();

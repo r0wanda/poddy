@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
-#include "tui/tui.hpp"
-#include "gpod/gpod.hpp"
-#include "finddev/finddev.hpp"
-#include "podmod/podmod.hpp"
-#include "settings/settings.hpp"
+#include <tui.hpp>
+#include <gpod.hpp>
+#include <finddev.hpp>
+#include <podmod.hpp>
+#include <settings.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 

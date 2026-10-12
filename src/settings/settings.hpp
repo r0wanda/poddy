@@ -3,8 +3,8 @@
 #include <memory>
 #include <fstream>
 #include <filesystem>
-#include <nohmann/json.hpp>
-#include "../podmod/podmod.hpp"
+#include <nlohmann/json.hpp>
+#include <podmod.hpp>
 
 // abstract class that handles settings
 /*template <typename T>
@@ -40,32 +40,29 @@ private:
 	bool changed = false;
 };*/
 
-template <typename S>
 class PodSettings : public IndepPodMod {
 public:
-	PodSettings(std::string _name): PodMod(_name), written(false) {
-		settingsPath = configPath / name / ".json";
-		loadConfig();
-	}
+	PodSettings(std::string _name);
 protected:
-	S settings;
 	std::filesystem::path settingsPath;
-	void writeConfig() {
-		nlohmann::json j = settings;
+	template <typename T>
+	void writeConfig(const T &strct) {
+		nlohmann::json j = strct;
 		std::ofstream strm(settingsPath);
 		strm << j;
 		strm.close();
 	}
-	void loadConfig(S strct) {
+	template <typename T>
+	T loadConfig() {
 		try {
 			std::ifstream strm(settingsPath);
 			nlohmann::json j;
 			strm >> j;
 			strm.close();
-			settings = j.get<S>();
+			return j.get<T>();
 		} catch (...) {
 			// TODO: err handling
-			settings = S();
+			return T();
 		}
 	}
 };
@@ -74,5 +71,5 @@ protected:
 class SettingsIface : public PodMod {
 public:
 private:
-	std::vector<std::shared_ptr<PodSettings>> insts;
+	std::vector<PodSettings> insts;
 };
