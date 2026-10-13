@@ -1,5 +1,5 @@
 #include "poddy.hpp"
-#include <span>
+#include <ranges>
 #include <vector>
 #include <string>
 #include <ftxui/component/component.hpp>
@@ -39,9 +39,8 @@ void PoddyMain::loadMainMenu() {
 	// selectors
 	static int menuToggleSel = 0;
 	static int menuSel;
-	static int menuSortSel;
+	static int menuSortSel = 0;
 	menuSel = 0;
-	menuSortSel = 0;
 
 	// menu settings
 	static constexpr std::vector<std::string> tabVals{
@@ -52,8 +51,7 @@ void PoddyMain::loadMainMenu() {
 	};
 	// backwards alphabetical
 	static bool azBackwards = false;
-	static constexpr std::span<const std::string> _sortVals{"Artist", "Name", "Release Date", "Recently Played"};
-	std::span<const std::string> sortVals;
+	std::vector<const std::string> sortVals;
 
 	// menu settings components
 	static Toggle mainMenuToggle = Toggle(&tabVals, &menuToggleSel);
@@ -64,25 +62,27 @@ void PoddyMain::loadMainMenu() {
 	switch (menuToggleSel) {
 	case 0:
 		menuItems = std::vector<GpodBasePtr>(gpod->albums.begin(), gpod->albums.end());
-		sortVals = _sortVals;
+		sortVals = GpodAlbum::
 		break;
 	case 1:
 		menuItems = std::vector<GpodBasePtr>(gpod->artists.begin(), gpod->artists.end());
-		sortVals = _sortVals.subspan(1);
+		sortVals = gpod->albums.first()->sort;
 		break;
 	case 2:
 		menuItems = std::vector<GpodBasePtr>(gpod->playlists.begin(), gpod->playlists.end());
-		sortVals = _sortVals.subspan(1);
+		sortVals = _sortVals.subspan(1, 3);
 		break;
 	case 3:
 		menuItems = std::vector<GpodBasePtr>(gpod->tracks.begin(), gpod->tracks.end());
 		break;
 	}
-	auto menuSortDD = Dropdown(&sortVals, )
+
+	// sort menu
+	auto menuSortDD = Dropdown(&sortVals, &menuSortSel)
 	auto menuToggleCont = Container::Horizontal({
-		mainMenuToggle,
+		mainMenuToggle, menuSortDD
 	});
-	menuEnts.push_back();
+	menuEnts.push_back(menuToggleCont);
 	menuEnts.push_back(Renderer([] { return separator(); }));
 
 	for (GpodBasePtr &base : menuItems) {

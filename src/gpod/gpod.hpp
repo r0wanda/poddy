@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <ctime>
 #include <string>
 #include <vector>
 #include <memory>
@@ -13,6 +14,8 @@ class GpodArtist;
 class GpodAlbum;
 class GpodTrack;
 class Gpod;
+
+typedef std::map<std::string, std::string> GpodSortMap;
 
 /**
  * @brief utility 
@@ -31,9 +34,13 @@ class GpodBase : public std::enable_shared_from_this<GpodBase> {
 public:
 	GpodBase(Gpod *gp);
 	GpodBase(std::string nm, Gpod *gp);
-	std::string name;
-	virtual explicit operator std::string() const;
+	GpodBase(std::string nm, std::string sortNm, Gpod *gp);
+	const std::string name;
+	const std::string sortName;
+	virtual std::string GpodBase::display();
 	std::shared_ptr<GpodBase> getBasePtr();
+	GpodSortMap sort;
+	static constexpr std::vector<std::string> sortKeys;
 private:
 	Gpod *gpod = nullptr;
 };
@@ -42,15 +49,29 @@ private:
 
 class GpodArtwork : public GpodBase, public SharedPtrGet<GpodArtwork> {
 public:
-	Itdb_Artwork *art = nullptr;
 	void write(GpodTrack *tr);
+protected:
+	Itdb_Artwork *art = nullptr;
 };
 
 #define GPODARTWORK(b) GPODBASEPTR_CAST(b, GpodArtwork)
 
+struct GpodTrackData {
+	std::string genre;
+	std::string filetype;
+	std::string comment;
+	std::string category;
+	std::string composer;
+	std::string description;
+};
+struct GpodTrackSort {
+	std::string sort_title;
+	std::string sort_composer;
+	std::string sort_tvshow;
+}
+
 class GpodTrack : public GpodBase, public SharedPtrGet<GpodTrack> {
 public:
-	Itdb_Track *track = nullptr;
 	std::shared_ptr<GpodArtist> artist;
 	std::shared_ptr<GpodAlbum> album;
 	unsigned short playcount;
@@ -58,27 +79,39 @@ public:
 	unsigned long ts;
 	GpodTrack(Itdb_Track *tr, Gpod *gp);
 	GpodTrack(TagLib::FileRef ref, Gpod *gp);
-	virtual explicit operator std::string() const;
+	virtual std::string GpodBase::display();
+protected:
+	Itdb_Track *track = nullptr;
 };
 
 #define GPODTRACK(b) GPODBASEPTR_CAST(b, GpodTrack)
+
+std::map<> GpodAlbumSort {
+	std::string sort_album;
+	std::string sort_albumartist;
+};
 
 class GpodAlbum : public GpodBase, public SharedPtrGet<GpodAlbum> {
 public:
 	std::shared_ptr<GpodArtist> artist;
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
-	GpodAlbum(std::string n, Gpod *gp);
-	virtual explicit operator std::string() const;
+	GpodAlbum(std::string n, std::shared_ptr<GpodArtist> arst, Gpod *gp);
+	virtual std::string GpodBase::display();
+	
 };
 
 #define GPODALBUM(b) GPODBASEPTR_CAST(b, GpodAlbum)
+
+struct GpodArtistSort {
+	std::string sort_artist;
+};
 
 class GpodArtist : public GpodBase, public SharedPtrGet<GpodArtist> {
 public:
 	std::map<std::string, std::shared_ptr<GpodAlbum>> albums;
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
 	GpodArtist(std::string n, Gpod *gp);
-	virtual explicit operator std::string() const;
+	virtual std::string GpodBase::display();
 };
 
 #define GPODARTIST(b) GPODBASEPTR_CAST(b, GpodArtist)
@@ -92,18 +125,19 @@ public:
 
 class Gpod {
 public:
-	Itdb_iTunesDB *itdb = nullptr;
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
 	std::map<std::string, std::shared_ptr<GpodArtist>> artists;
 	std::vector<std::shared_ptr<GpodAlbum>> albums;
 	Gpod(std::string dbPath, std::function<void(GError*, bool)> errH);
 	void process(std::function<void(int)> perCb);
 	~Gpod();
+
 	friend class GpodTrack;
 	friend class GpodAlbum;
 	friend class GpodArtist;
 	friend class GpodPlaylist;
 protected:
+	Itdb_iTunesDB *itdb = nullptr;
 	void throwG(bool fatal);
 	std::string path;
 	std::function<void(GError*, bool)> errHandle;

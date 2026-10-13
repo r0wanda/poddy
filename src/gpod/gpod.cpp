@@ -9,12 +9,14 @@ GpodBasePtr GpodBase::getBasePtr() {
 	return shared_from_this();
 }
 
-GpodBase::GpodBase(Gpod *gp): name("untitled"), gpod(gp) {
+GpodBase::GpodBase(Gpod *gp): name("untitled"), sortName(name), sort({{"Name", sortName}}), gpod(gp) {
 }
-GpodBase::GpodBase(std::string nm, Gpod *gp): name(nm), gpod(gp) {
+GpodBase::GpodBase(std::string nm, Gpod *gp): name(nm), sortName(name), sort({{"Name", sortName}}), gpod(gp) {
+}
+GpodBase::GpodBase(std::string nm, std::string sortNm, Gpod *gp): name(nm), sortName(sortNm), sort({{"Name", sortName}}), gpod(gp) {
 }
 
-GpodBase::operator std::string() const {
+std::string GpodBase::display() {
 	return name;
 }
 
@@ -29,14 +31,17 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
 	}
 }
 
-GpodTrack::operator std::string() const {
+std::string GpodTrack::display() {
 	return artist->name + " - " + name;
 }
 
-GpodAlbum::GpodAlbum(std::string n, Gpod *gp): GpodBase::GpodBase(n, gp) {
+GpodAlbum::GpodAlbum(std::string n, std::string sortNm, int year, GpodArtistPtr arst, Gpod *gp): GpodBase::GpodBase(n, sortNm, gp), artist(arst) {
+	sort.insert({"Artist", artist->sortName});
+	sort.insert({"Release Date", std::to_string(year)});
+	sort.insert({"Recently Played", })
 }
 
-GpodAlbum::operator std::string() const {
+std::string GpodArtist::display() {
 	return artist->name + " - " + name;
 }
 
@@ -56,6 +61,8 @@ void Gpod::process(std::function<void(int)> perCb) {
 		GpodTrackPtr gt = std::make_shared<GpodTrack>(tr, this);
 		std::string arName(tr->artist);
 		std::string alName(tr->album);
+		std::string arSortName(tr->sort_artist);
+		std::string alSortName(tr->sort_album);
 
 		// add to tracks
 		tracks.push_back(gt);
@@ -74,14 +81,13 @@ void Gpod::process(std::function<void(int)> perCb) {
 		// add album to artist, synchronise everything
 		GpodAlbumPtr album;
 		if (artist->albums.find(alName) == artist->albums.end()) {
-			album = std::make_shared<GpodAlbum>(alName, this);
+			album = std::make_shared<GpodAlbum>(alName, alSortName, artist->getPtr(), this);
 			artist->albums[alName] = album;
 		} else {
 			album = artist->albums.at(alName);
 		}
 		albums.push_back(album->getPtr());
 		album->tracks.push_back(gt);
-		album->artist = artist;
 		gt->album = album->getPtr();
 	}
 }
