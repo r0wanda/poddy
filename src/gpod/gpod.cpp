@@ -16,11 +16,16 @@ GpodBase::GpodBase(std::string nm, Gpod *gp): name(nm), sortName(name), sort({{"
 GpodBase::GpodBase(std::string nm, std::string sortNm, Gpod *gp): name(nm), sortName(sortNm), sort({{"Name", sortName}}), gpod(gp) {
 }
 
-std::string GpodBase::display() {
+std::string GpodBase::display() const {
 	return name;
 }
 
-GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): GpodBase::GpodBase(tr->title, gp), playcount() {}
+GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): GpodBase::GpodBase(tr->title, gp), playcount() {
+	sort.insert({"Artist", artist->sortName});
+	sort.insert({"Release Date", std::to_string(year)});
+	sort.insert({"Most Played", 0});
+	sort.insert({"Recently Played", 0})
+}
 GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
 	TagLib::Tag *tag = ref.tag();
 	Itdb_Track *tr = itdb_track_new();
@@ -31,17 +36,18 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
 	}
 }
 
-std::string GpodTrack::display() {
+std::string GpodTrack::display() const override {
 	return artist->name + " - " + name;
 }
 
 GpodAlbum::GpodAlbum(std::string n, std::string sortNm, int year, GpodArtistPtr arst, Gpod *gp): GpodBase::GpodBase(n, sortNm, gp), artist(arst) {
 	sort.insert({"Artist", artist->sortName});
 	sort.insert({"Release Date", std::to_string(year)});
-	sort.insert({"Recently Played", })
+	sort.insert({"Most Played", 0});
+	sort.insert({"Recently Played", 0})
 }
 
-std::string GpodArtist::display() {
+std::string GpodArtist::display() const override {
 	return artist->name + " - " + name;
 }
 
@@ -114,5 +120,3 @@ Gpod::~Gpod() {
 
 void GpodArtwork::write(GpodTrack *tr) {
 }
-
-#undef SHARED

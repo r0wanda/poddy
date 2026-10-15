@@ -25,12 +25,12 @@ typedef std::map<std::string, std::string> GpodSortMap;
 template <typename T>
 class SharedPtrGet : public std::enable_shared_from_this<T> {
 public:
-	std::shared_ptr<T> getPtr() {
+	virtual std::shared_ptr<T> getPtr() {
 		return this->shared_from_this();
 	}
 };
 
-class GpodBase : public std::enable_shared_from_this<GpodBase> {
+class GpodBase : public SharedPtrGet<GpodBase> {
 public:
 	GpodBase(Gpod *gp);
 	GpodBase(std::string nm, Gpod *gp);
@@ -40,7 +40,8 @@ public:
 	virtual std::string GpodBase::display();
 	std::shared_ptr<GpodBase> getBasePtr();
 	GpodSortMap sort;
-	static constexpr std::vector<std::string> sortKeys;
+	virtual const std::vector<std::string> sortKeys;
+	virtual ~GpodBase() = default;
 private:
 	Gpod *gpod = nullptr;
 };
@@ -79,9 +80,10 @@ public:
 	unsigned long ts;
 	GpodTrack(Itdb_Track *tr, Gpod *gp);
 	GpodTrack(TagLib::FileRef ref, Gpod *gp);
-	virtual std::string GpodBase::display();
+	std::string GpodBase::display();
 protected:
 	Itdb_Track *track = nullptr;
+private:
 };
 
 #define GPODTRACK(b) GPODBASEPTR_CAST(b, GpodTrack)
@@ -96,8 +98,7 @@ public:
 	std::shared_ptr<GpodArtist> artist;
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
 	GpodAlbum(std::string n, std::shared_ptr<GpodArtist> arst, Gpod *gp);
-	virtual std::string GpodBase::display();
-	
+	std::string GpodBase::display();
 };
 
 #define GPODALBUM(b) GPODBASEPTR_CAST(b, GpodAlbum)
@@ -111,7 +112,7 @@ public:
 	std::map<std::string, std::shared_ptr<GpodAlbum>> albums;
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
 	GpodArtist(std::string n, Gpod *gp);
-	virtual std::string GpodBase::display();
+	std::string GpodBase::display();
 };
 
 #define GPODARTIST(b) GPODBASEPTR_CAST(b, GpodArtist)
