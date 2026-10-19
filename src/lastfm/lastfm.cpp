@@ -250,11 +250,12 @@ int lfm(Gpod *gpod) {
 	int ign = 0;
 	
 	std::vector<GpodTrackPtr> scrobbles;
-	for (const GpodTrackPtr &tr : gpod.tracks) {
+	for (const GpodTrackPtr &gtr : gpod.tracks) {
+		GpodTrackPlayData tr = gtr->playData;
 		if (tr->playcount < 1) continue;
 
-		unsigned short playcount = tr->playcount;
-		cache.dbset(&cache.db, tr->title, tr->playcount, ts);
+		unsigned short playcount = tr.playcount;
+		cache.dbset(&cache.db, gtr->title, tr.playcount, ts);
 		auto cData = cache.dbget(&cache.initdb, tr);
 
 		if (ts <= cData.second) continue;
@@ -268,10 +269,8 @@ int lfm(Gpod *gpod) {
 				total += n;
 				n = 0;
 			}
-			Scrobble *sc = (Scrobble*)malloc(sizeof(Scrobble));
-			sc->track = tr;
 			// add 60 seconds between repeated tracks bc itdb doesnt track all timestamps for plays
-			sc->ts = tr->time_played + i * 60;
+			sc->ts = tr.ts + i * 60;
 			if (first == nullptr) {
 				first = sc;
 				prev = sc;
