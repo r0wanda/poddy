@@ -203,7 +203,7 @@ public:
 	GpodSortContainer albums;
 	std::map<std::string, std::shared_ptr<GpodArtist>> artistMap;
 
-	Gpod(std::string dbPath, std::function<void(GError*, bool)> errH);
+	Gpod(std::string dbPath, const std::function<void(GError*, bool)> &errH);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 	void addArtist(std::shared_ptr<GpodArtist> ar);
@@ -223,7 +223,7 @@ protected:
 	void throwG(GError **e, bool fatal);
 	void throwG(std::string e, bool fatal);
 	std::string path;
-	std::function<void(GError*, bool)> errHandle;
+	const std::function<void(GError*, bool)> &errHandle;
 	GError *err;
 };
 

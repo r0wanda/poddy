@@ -46,6 +46,9 @@ void Tui::popup(ftxui::Component pop) {
 	app->Loop(renderer);
 	//std::getchar();
 }
+void Tui::error(std::string err) {
+	error(err, false);
+}
 void Tui::error(std::string err, bool fatal) {
 	Render(*app, vbox({
 		text("Error") | hcenter,

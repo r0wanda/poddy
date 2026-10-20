@@ -204,7 +204,7 @@ void GpodSortContainer::finalize() {
 
 
 // gpod main class
-Gpod::Gpod(std::string dbPath, std::function<void(GError*, bool)> errH):
+Gpod::Gpod(std::string dbPath, const std::function<void(GError*, bool)> &errH):
 tracks(this), artists(this), albums(this), path(dbPath), errHandle(errH), err(nullptr) {
     itdb = itdb_parse(path.c_str(), &err);
 	throwG(true);
