@@ -13,4 +13,4 @@ target_sources(PodMod
 )
 
 #target_include_directories(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component miniz)
+target_link_libraries(PodMod PRIVATE PoddyConfig ftxui::screen ftxui::dom ftxui::component miniz)

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <ftxui/screen/color.hpp>
-#include "../config.hpp"
+#include <config.hpp>
 
 #ifdef IS_LINUX
 #include <udisks/udisks.h>
@@ -37,7 +37,7 @@ DiskDev::DiskDev(UDisksBlock *b, UDisksFilesystem *fs, FindDev *fd): dev(fs), fi
 }
 #endif
 
-static void deviceChange(GDBusObjectManager *manager, GDBusObject *obj, gpointer data) {
+static void deviceChange([[ maybe_unused ]] GDBusObjectManager *manager, [[ maybe_unused ]] GDBusObject *obj, gpointer data) {
 	FindDev *dev = static_cast<FindDev*>(data);
 	dev->refresh();
 }
@@ -69,7 +69,11 @@ static void notifWorker(std::stop_token tok, FindDev *findd, Tui *tui) {
 	g_main_context_unref(ctx);
 }
 
-FindDev::FindDev(Tui *_tui): tui(_tui), err(nullptr), menuSel(0) {
+FindDev::FindDev(Tui *_tui): tui(_tui),
+#ifdef IS_LINUX
+err(nullptr),
+#endif
+menuSel(0) {
 #ifdef IS_LINUX
     client = udisks_client_new_sync(nullptr, &err);
     

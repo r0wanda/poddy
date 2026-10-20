@@ -12,7 +12,7 @@
  * @brief ipod interface window
  * 
  */
-class PoddyMain : public PodSettings {
+class PoddyMain : public PodSettingsMod {
 public:
 	PoddyMain();
 	void loadMainMenu();

@@ -23,4 +23,4 @@ target_link_libraries(FindDev PRIVATE ${LIBUDISKS_LIBRARIES})
 endif()
 
 #target_include_directories(FindDev PRIVATE ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(FindDev PRIVATE ftxui::screen ftxui::dom ftxui::component PoddyTui)
+target_link_libraries(FindDev PRIVATE PoddyConfig ftxui::screen ftxui::dom ftxui::component PoddyTui)

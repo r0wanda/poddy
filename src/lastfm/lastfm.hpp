@@ -6,7 +6,7 @@
 #include <gpod.hpp>
 #include <settings.hpp>
 
-class Lastfm : public PodSettings {
+class Lastfm : public PodSettingsMod {
 public:
 	Lastfm(const char *key, const char *sec);
 	void load(Cache *cache);

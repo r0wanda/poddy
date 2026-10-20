@@ -28,7 +28,7 @@ private:
 	void *handle;
 }
 
-class ModManager : public PodSettings {
+class ModManager : public PodSettingsMod {
 public:
 	ModManager
 };

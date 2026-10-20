@@ -1,9 +1,9 @@
 #include "podmod.hpp"
-#include "../config.hpp"
+#include <config.hpp>
 namespace fs = std::filesystem;
 
 IndepPodMod::IndepPodMod(std::string _name): name(_name) {
-	if (!confReady) startConfig();
+	startConfig();
 	configPath = configDir / name;
 	cachePath = cacheDir / name;
 	if (!fs::exists(configPath)) fs::create_directory(configPath);

@@ -6,7 +6,7 @@
 #include <thread>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
-#include "../config.hpp"
+#include <config.hpp>
 #include <tui.hpp>
 
 #ifdef IS_LINUX

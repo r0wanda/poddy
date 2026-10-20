@@ -7,7 +7,7 @@
 
 using namespace ftxui;
 
-PoddyMain::PoddyMain(): PodSettings("iPod") {
+PoddyMain::PoddyMain(): PodSettingsMod("iPod") {
 	loadMainMenu();
 	content = Container::Horizontal({
 		controls->Render(),

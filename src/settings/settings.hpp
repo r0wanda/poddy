@@ -6,6 +6,8 @@
 #include <nlohmann/json.hpp>
 #include <podmod.hpp>
 
+class Poddy;
+
 // abstract class that handles settings
 /*template <typename T>
 class Tracker {
@@ -40,6 +42,10 @@ private:
 	bool changed = false;
 };*/
 
+/**
+ * @brief PodSettings WITHOUT window
+ * 
+ */
 class PodSettings : public IndepPodMod {
 public:
 	PodSettings(std::string _name);
@@ -65,6 +71,15 @@ protected:
 			return T();
 		}
 	}
+};
+
+/**
+ * @brief PodSettings WITH window
+ * 
+ */
+class PodSettingsMod : public PodSettings, public PodMod {
+public:
+	PodSettingsMod(std::string _name, Poddy *pod);
 };
 
 // module to edit settings
