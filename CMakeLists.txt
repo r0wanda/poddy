@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(Poddy LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 26)
 
 add_executable(poddy)
 
