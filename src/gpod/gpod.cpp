@@ -29,11 +29,11 @@ GpodBasePtr GpodBase::getBasePtr() {
 	return shared_from_this();
 }
 
-GpodBase::GpodBase(Gpod *gp): name("untitled"), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
+GpodBase::GpodBase(GpodPtr gp): name("untitled"), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
 }
-GpodBase::GpodBase(std::string nm, Gpod *gp): name(nm), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
+GpodBase::GpodBase(std::string nm, GpodPtr gp): name(nm), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
 }
-GpodBase::GpodBase(std::string nm, std::string sortNm, Gpod *gp): name(nm), sortName(sortNm), sort({{"Name", { sortName, true }}}), gpod(gp) {
+GpodBase::GpodBase(std::string nm, std::string sortNm, GpodPtr gp): name(nm), sortName(sortNm), sort({{"Name", { sortName, true }}}), gpod(gp) {
 }
 
 std::string GpodBase::display() const {
@@ -67,14 +67,14 @@ GpodTrackPlayData::GpodTrackPlayData(Itdb_Track *tr):
 	_gts(playcount), recentPlaycount(tr->recent_playcount), ts(tr->time_played) {}
 #undef _gts
 
-GpodTrack::GpodTrack(Itdb_Track *tr, Gpod *gp): GpodBase::GpodBase(tr->title, gp), playData(tr), trackData(tr) {
+GpodTrack::GpodTrack(Itdb_Track *tr, GpodPtr gp): GpodBase::GpodBase(tr->title, gp), playData(tr), trackData(tr) {
 	sort.insert({"Artist", { "", true }});
 	sort.insert({"Album", { "", true, static_cast<int>(trackData.trackN) }});
 	sort.insert({"Release Date", { std::to_string(tr->year), false }});
 	sort.insert({"Most Played", { std::to_string(tr->playcount), false }});
 	sort.insert({"Recently Played", { std::to_string(tr->time_played), false }});
 }
-GpodTrack::GpodTrack(TagLib::FileRef ref, Gpod *gp): GpodBase::GpodBase(gp) {
+GpodTrack::GpodTrack(TagLib::FileRef ref, GpodPtr gp): GpodBase::GpodBase(gp) {
 	TagLib::Tag *tag = ref.tag();
 	Itdb_Track *tr = itdb_track_new();
 	if (tag == NULL) {
@@ -96,7 +96,7 @@ std::string GpodTrack::display() const {
 	return artist->name + " - " + name;
 }
 
-GpodAlbum::GpodAlbum(std::string n, std::string sortNm, int year, GpodArtistPtr arst, Gpod *gp): GpodBase::GpodBase(n, sortNm, gp), artist(arst) {
+GpodAlbum::GpodAlbum(std::string n, std::string sortNm, int year, GpodArtistPtr arst, GpodPtr gp): GpodBase::GpodBase(n, sortNm, gp), artist(arst) {
 	artist->addAlbum(getPtr());
 	sort.insert({"Artist", { artist->sortName, true }});
 	sort.insert({"Release Date", { std::to_string(year), false }});
@@ -117,7 +117,7 @@ void GpodAlbum::addTrack(GpodTrackPtr tr) {
 	if (ts < tr->playData.ts) sort["Recently Played"].sortName = std::to_string(tr->playData.ts);
 }
 
-GpodArtist::GpodArtist(std::string n, std::string sortNm, Gpod *gp): GpodBase::GpodBase(n, sortNm, gp), tracks(gp), albums(gp) {
+GpodArtist::GpodArtist(std::string n, std::string sortNm, GpodPtr gp): GpodBase::GpodBase(n, sortNm, gp), tracks(gp), albums(gp) {
 	sort.insert({"Most Played", { "0", false }});
 	sort.insert({"Recently Played", { "0", false }});
 }
@@ -151,8 +151,8 @@ std::optional<GpodAlbumPtr> GpodArtist::getAlbum(std::string name) {
 
 
 // gpod sort container
-GpodSortContainer::GpodSortContainer(Gpod *gp): finalized(false), gpod(gp) {}
-GpodSortContainer::GpodSortContainer(std::vector<GpodBasePtr> vec, Gpod *gp): items(vec), finalized(true), gpod(gp) {
+GpodSortContainer::GpodSortContainer(GpodPtr gp): finalized(false), gpod(gp) {}
+GpodSortContainer::GpodSortContainer(std::vector<GpodBasePtr> vec, GpodPtr gp): items(vec), finalized(true), gpod(gp) {
 	for (const auto &p : items.at(0)->sort) {
 		sorts.insert({p.first, {}});
 	}
@@ -265,6 +265,10 @@ void Gpod::process(std::function<void(int)> perCb) {
 	tracks.finalize();
 	artists.finalize();
 	albums.finalize();
+}
+
+std::shared_ptr<Gpod> Gpod::getPtr() {
+	return shared_from_this();
 }
 
 void Gpod::throwG(bool fatal) {

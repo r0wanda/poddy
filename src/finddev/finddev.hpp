@@ -43,7 +43,7 @@ class FindDev {
 public:
 	DiskDev *connected = nullptr;
 	std::vector<DiskDevPtr> devs;
-	FindDev(Tui *_tui);
+	FindDev(TuiPtr _tui);
 	void start();
 	void stop();
 	void refresh();
@@ -56,7 +56,7 @@ private:
 	UDisksClient *client;
 	GDBusObjectManager *manager;
 #endif
-	Tui *tui;
+	TuiPtr tui;
 	ftxui::Component menu;
 	ftxui::Element connectDialog;
 	int menuSel;

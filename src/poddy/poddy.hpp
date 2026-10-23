@@ -14,7 +14,7 @@
  */
 class PoddyMain : public PodSettingsMod {
 public:
-	PoddyMain();
+	PoddyMain(GpodPtr gp);
 	void loadMainMenu();
 private:
 	int selected;
@@ -29,8 +29,8 @@ private:
 
 class Poddy {
 public:
-	Tui *tui;
-	Gpod *gpod = nullptr;
+	TuiPtr tui;
+	GpodPtr gpod;
 	FindDev findd;
 	std::vector<PodMod> modules;
 	Poddy(std::vector<PodMod> mods);

@@ -16,7 +16,8 @@
                 "/usr/include/sysprof-6",
                 "${workspaceFolder}/build/_deps/ftxui-src/include",
                 "/usr/include/udisks2",
-                "${workspaceFolder}/build/src"
+                "${workspaceFolder}/build/src",
+				"${workspaceFolder}/src/**"
             ],
             "defines": ["IS_LINUX"],
             "compilerPath": "/usr/bin/gcc"

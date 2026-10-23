@@ -61,3 +61,6 @@ void Tui::error(std::string err, bool fatal) {
 PodMod Tui::getCurTab() {
 	return modules[curTab];
 }
+std::shared_ptr<Tui> Tui::getPtr() {
+	return shared_from_this();
+}

@@ -41,4 +41,6 @@ public:
 	PodMod(std::string _name, Poddy *pod);
 protected:
 	Poddy *poddy;
+	GpodPtr gpod;
+	TuiPtr tui;
 };

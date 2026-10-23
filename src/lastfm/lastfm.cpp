@@ -226,7 +226,7 @@ std::string encodeURIComponent(std::string decoded) {
     return oss.str();
 }
 
-int lfm(Gpod *gpod) {
+int lfm(GpodPtr gpod) {
 	std::string inp;
 
 	//Lastfm lfm(std::getenv("LASTFM_API_KEY"), std::getenv("LASTFM_API_SECRET"));

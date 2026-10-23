@@ -41,7 +41,7 @@ static void deviceChange([[ maybe_unused ]] GDBusObjectManager *manager, [[ mayb
 	FindDev *dev = static_cast<FindDev*>(data);
 	dev->refresh();
 }
-static void notifWorker(std::stop_token tok, FindDev *findd, Tui *tui) {
+static void notifWorker(std::stop_token tok, FindDev *findd, TuiPtrtui) {
 	GMainContext *ctx = g_main_context_new();
 	g_main_context_push_thread_default(ctx);
 	GError *err = nullptr;
@@ -69,7 +69,7 @@ static void notifWorker(std::stop_token tok, FindDev *findd, Tui *tui) {
 	g_main_context_unref(ctx);
 }
 
-FindDev::FindDev(Tui *_tui): tui(_tui),
+FindDev::FindDev(TuiPtr _tui): tui(_tui),
 #ifdef IS_LINUX
 err(nullptr),
 #endif

@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <podmod.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/app.hpp>
@@ -7,7 +8,7 @@
 /**
  * extensible tui framework to manage and displat modules
  */
-class Tui {
+class Tui : std::enable_shared_from_this<Tui> {
 public:
 	ftxui::App *app;
 	ftxui::Component renderer;
@@ -19,8 +20,11 @@ public:
 	void error(std::string err);
 	void error(std::string err, bool fatal);
 	PodMod getCurTab();
+	std::shared_ptr<Tui> getPtr();
 private:
 	int curTab;
 	ftxui::Component tabmenu;
 	ftxui::Component toggle;
 };
+
+typedef std::shared_ptr<Tui> TuiPtr;
