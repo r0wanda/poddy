@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 	if (!startConfig()) {
 		return 1;
 	}
-	std::vector<PodMod> modules = { /*PoddyMain()*/ };
+	std::vector<PodModPtr> modules = { /*PoddyMain()*/ };
 	Poddy poddy(modules);
 	return 0;
 }

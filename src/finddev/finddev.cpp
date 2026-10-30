@@ -41,7 +41,7 @@ static void deviceChange([[ maybe_unused ]] GDBusObjectManager *manager, [[ mayb
 	FindDev *dev = static_cast<FindDev*>(data);
 	dev->refresh();
 }
-static void notifWorker(std::stop_token tok, FindDev *findd, TuiPtrtui) {
+static void notifWorker(std::stop_token tok, FindDev *findd, TuiPtr tui) {
 	GMainContext *ctx = g_main_context_new();
 	g_main_context_push_thread_default(ctx);
 	GError *err = nullptr;
@@ -176,7 +176,7 @@ void FindDev::refresh() {
 		if (std::find_if(devs.begin(), devs.end(), [&uuid](DiskDevPtr const &d) -> bool {
 			return d->uuid == uuid;
 		}) != devs.end()) continue;
-		DiskDevPtr ddev(new DiskDev(block, fs, this));
+		DiskDevPtr ddev = std::make_shared<DiskDev>(block, fs, this);
 		ndevs.insert({uuid, ddev});
     }
 	for (auto it = devs.begin(); it != devs.end(); it++) {

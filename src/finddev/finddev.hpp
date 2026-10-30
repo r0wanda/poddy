@@ -20,7 +20,7 @@
 
 class FindDev;
 
-class DiskDev {
+class DiskDev : public std::enable_shared_from_this<DiskDev> {
 public:
 	std::string uuid;
 	std::string path;

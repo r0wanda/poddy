@@ -32,7 +32,7 @@ public:
 	TuiPtr tui;
 	GpodPtr gpod;
 	FindDev findd;
-	std::vector<PodMod> modules;
-	Poddy(std::vector<PodMod> mods);
+	std::vector<PodModPtr> modules;
+	Poddy(std::vector<PodModPtr> mods);
 	void findIpod();
 };

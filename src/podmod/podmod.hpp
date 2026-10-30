@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 #include <filesystem>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/app.hpp>
@@ -11,7 +12,7 @@ class Poddy;
  * @brief podmod without window
  * 
  */
-class IndepPodMod {
+class IndepPodMod : public std::enable_shared_from_this<IndepPodMod> {
 public:
 	std::string name;
 	/**
@@ -24,6 +25,7 @@ protected:
 	std::filesystem::path configPath;
 	std::filesystem::path cachePath;
 };
+typedef std::shared_ptr<IndepPodMod> IndepPodModPtr;
 
 /**
  * @brief module with window
@@ -44,3 +46,4 @@ protected:
 	GpodPtr gpod;
 	TuiPtr tui;
 };
+typedef std::shared_ptr<PodMod> PodModPtr;

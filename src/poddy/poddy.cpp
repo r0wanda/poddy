@@ -95,7 +95,7 @@ void PoddyMain::loadMainMenu() {
 }
 
 
-Poddy::Poddy(std::vector<PodMod> mods): modules(mods), tui(new Tui(modules)), findd(tui) {
+Poddy::Poddy(std::vector<PodMod> mods): tui(std::make_shared<Tui>(mods))modules(mods), findd(tui) {
 	findIpod();
 }
 

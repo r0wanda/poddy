@@ -9,24 +9,10 @@
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
 
-GpodTrackPtr GpodTrack::getPtr() {
-	return std::dynamic_pointer_cast<GpodTrack>(getBasePtr());
-}
-GpodAlbumPtr GpodAlbum::getPtr() {
-	return std::dynamic_pointer_cast<GpodAlbum>(getBasePtr());
-}
-GpodArtistPtr GpodArtist::getPtr() {
-	return std::dynamic_pointer_cast<GpodArtist>(getBasePtr());
-}
-
 bool GpodSortItem::compare(const GpodSortItem &it) {
 	int comp = sortName.compare(it.sortName);
 	if (comp != 0 || trackN < 0) return comp > 0;
 	return trackN > it.trackN;
-}
-
-GpodBasePtr GpodBase::getBasePtr() {
-	return shared_from_this();
 }
 
 GpodBase::GpodBase(GpodPtr gp): name("untitled"), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
@@ -84,7 +70,7 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, GpodPtr gp): GpodBase::GpodBase(gp) {
 	}
 }
 void GpodTrack::setArtist(GpodArtistPtr ar) {
-	artist = ar->getPtr();
+	artist = ar->getPtr<GpodArtist>();
 	sort["Artist"].sortName = album->sortName;
 }
 void GpodTrack::setAlbum(GpodAlbumPtr al) {

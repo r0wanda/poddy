@@ -12,6 +12,7 @@
 #include <gpod/itdb.h>
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
+#include "../util.hpp"
 
 
 class GpodArtist;
@@ -36,24 +37,21 @@ typedef std::map<const std::string, GpodSortItem> GpodSortMap;
  * @brief gpod base class
  * 
  */
-class GpodBase : public std::enable_shared_from_this<GpodBase> {
+class GpodBase : public PodUtil::GetPtr<GpodBase> {
 public:
-	GpodBase(GpodPtr gp);
-	GpodBase(std::string nm, GpodPtr gp);
-	GpodBase(std::string nm, std::string sortNm, GpodPtr gp);
+	GpodBase(std::shared_ptr<Gpod> gp);
+	GpodBase(std::string nm, std::shared_ptr<Gpod> gp);
+	GpodBase(std::string nm, std::string sortNm, std::shared_ptr<Gpod> gp);
 	const std::string name;
 	const std::string sortName;
 	virtual std::string display() const;
-	std::shared_ptr<GpodBase> getBasePtr();
 	GpodSortMap sort;
 	virtual ~GpodBase() = default;
 
 	friend class Gpod;
 private:
-	GpodPtr gpod = nullptr;
+	std::shared_ptr<Gpod> gpod = nullptr;
 };
-
-#define GPODBASEPTR_CAST(b, C) std::dynamic_pointer_cast<C>((b)->getBasePtr())
 
 /**
  * @brief lazy-sort gpodbase objects
@@ -61,8 +59,8 @@ private:
  */
 class GpodSortContainer {
 public:
-	GpodSortContainer(GpodPtr gp);
-	GpodSortContainer(std::vector<std::shared_ptr<GpodBase>> vec, GpodPtr gp);
+	GpodSortContainer(std::shared_ptr<Gpod> gp);
+	GpodSortContainer(std::vector<std::shared_ptr<GpodBase>> vec, std::shared_ptr<Gpod> gp);
 	
 	std::vector<std::shared_ptr<GpodBase>> get(std::string key);
 	void sort(std::string key);
@@ -79,7 +77,7 @@ protected:
 	bool finalized;
 private:
 	std::map<std::string, std::vector<std::shared_ptr<GpodBase>>> sorts;
-	GpodPtr gpod;
+	std::shared_ptr<Gpod> gpod;
 };
 
 
@@ -90,8 +88,6 @@ public:
 protected:
 	Itdb_Artwork *art = nullptr;
 };
-
-#define GPODARTWORK(b) GPODBASEPTR_CAST(b, GpodArtwork)
 
 struct GpodTrackData {
 	GpodTrackData() = default;
@@ -135,17 +131,14 @@ public:
 	GpodTrackPlayData playData;
 	GpodTrackData trackData;
 	
-	GpodTrack(Itdb_Track *tr, GpodPtr gp);
-	GpodTrack(TagLib::FileRef ref, GpodPtr gp);
+	GpodTrack(Itdb_Track *tr, std::shared_ptr<Gpod> gp);
+	GpodTrack(TagLib::FileRef ref, std::shared_ptr<Gpod> gp);
 	void setArtist(std::shared_ptr<GpodArtist> ar);
 	void setAlbum(std::shared_ptr<GpodAlbum> al);
 	std::string display() const override;
-	std::shared_ptr<GpodTrack> getPtr();
 protected:
 	Itdb_Track *track = nullptr;
 };
-
-#define GPODTRACK(b) GPODBASEPTR_CAST(b, GpodTrack)
 
 class GpodAlbum : public GpodBase {
 public:
@@ -154,17 +147,14 @@ public:
 	// maybe in future add sorting in album view? cant think of a reason tho
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
 
-	GpodAlbum(std::string n, std::string sortNm, int year, std::shared_ptr<GpodArtist> arst, GpodPtr gp);
+	GpodAlbum(std::string n, std::string sortNm, int year, std::shared_ptr<GpodArtist> arst, std::shared_ptr<Gpod> gp);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 
 	std::string display() const override;
-	std::shared_ptr<GpodAlbum> getPtr();
 protected:
 	void finalize();
 };
-
-#define GPODALBUM(b) GPODBASEPTR_CAST(b, GpodAlbum)
 
 struct GpodArtistSort {
 	std::string sort_artist;
@@ -175,13 +165,12 @@ public:
 	GpodSortContainer tracks;
 	GpodSortContainer albums;
 
-	GpodArtist(std::string n, std::string sortNm, GpodPtr gp);
+	GpodArtist(std::string n, std::string sortNm, std::shared_ptr<Gpod> gp);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 	void addAlbum(std::shared_ptr<GpodAlbum> al, bool addTracks = false);
 	std::optional<std::shared_ptr<GpodAlbum>> getAlbum(std::string name);
 	std::string display() const override;
-	std::shared_ptr<GpodArtist> getPtr();
 protected:
 	void finalize();
 };
@@ -196,7 +185,7 @@ public:
 #define GPODPLAYLIST(b) GPODBASEPTR_CAST(b, GpodPlaylist)
 
 
-class Gpod : public std::enable_shared_from_this<Gpod> {
+class Gpod : public PodUtil::GetPtr<Gpod> {
 public:
 	GpodSortContainer tracks;
 	GpodSortContainer artists;
@@ -209,7 +198,6 @@ public:
 	void addArtist(std::shared_ptr<GpodArtist> ar);
 	void addAlbum(std::shared_ptr<GpodAlbum> al);
 	void process(std::function<void(int)> perCb);
-	std::shared_ptr<Gpod> getPtr();
 
 	~Gpod();
 
