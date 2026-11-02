@@ -8,6 +8,7 @@
 #include <ftxui/dom/elements.hpp>
 #include <config.hpp>
 #include <tui.hpp>
+#include "../util.hpp"
 
 #ifdef IS_LINUX
 #include <udisks/udisks.h>
@@ -20,7 +21,7 @@
 
 class FindDev;
 
-class DiskDev : public std::enable_shared_from_this<DiskDev> {
+class DiskDev : public PodUtil::GetPtr<DiskDev> {
 public:
 	std::string uuid;
 	std::string path;
@@ -51,12 +52,12 @@ public:
 	~FindDev();
 	friend class DiskDev;
 private:
+	TuiPtr tui;
 #ifdef IS_LINUX
 	GError *err;
 	UDisksClient *client;
 	GDBusObjectManager *manager;
 #endif
-	TuiPtr tui;
 	ftxui::Component menu;
 	ftxui::Element connectDialog;
 	int menuSel;

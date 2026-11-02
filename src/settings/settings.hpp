@@ -6,8 +6,6 @@
 #include <nlohmann/json.hpp>
 #include <podmod.hpp>
 
-class Poddy;
-
 // abstract class that handles settings
 /*template <typename T>
 class Tracker {
@@ -79,7 +77,7 @@ protected:
  */
 class PodSettingsMod : public PodSettings, public PodMod {
 public:
-	PodSettingsMod(std::string _name, Poddy *pod);
+	PodSettingsMod(std::string _name, std::shared_ptr<Poddy> pod);
 };
 
 // module to edit settings

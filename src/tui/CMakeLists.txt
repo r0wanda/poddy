@@ -14,4 +14,4 @@ target_sources(PoddyTui
 
 #target_include_directories(PoddyTui PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 #target_include_directories(PoddyTui PUBLIC ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(PoddyTui PUBLIC ftxui::screen ftxui::dom ftxui::component PodMod)
+target_link_libraries(PoddyTui PUBLIC PodMod GpodXX ftxui::screen ftxui::dom ftxui::component)

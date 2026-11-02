@@ -237,7 +237,6 @@ DiskDev::~DiskDev() {
 	g_object_unref(dev);
 #endif
 	if (findd->connected == this) findd->connected = nullptr;
-	//if (client.unique()) g_object_unref(client.get());
 }
 
 /*int main() {

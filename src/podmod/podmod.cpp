@@ -1,5 +1,7 @@
 #include "podmod.hpp"
+#include <poddy.hpp>
 #include <config.hpp>
+#include <tui.hpp>
 namespace fs = std::filesystem;
 
 IndepPodMod::IndepPodMod(std::string _name): name(_name) {
@@ -11,4 +13,4 @@ IndepPodMod::IndepPodMod(std::string _name): name(_name) {
 }
 
 
-PodMod::PodMod(std::string _name, Poddy *pod): IndepPodMod::IndepPodMod(_name), poddy(pod) {}
+PodMod::PodMod(std::string _name, PoddyPtr pod): IndepPodMod::IndepPodMod(_name), poddy(pod) {}

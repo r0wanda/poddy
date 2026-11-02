@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.23)
 
-add_library(PoddySettings)
+add_library(PodSettings)
 
-target_sources(PoddySettings
+target_sources(PodSettings
 	PRIVATE
  		settings.cpp
 	PUBLIC
@@ -13,4 +13,4 @@ target_sources(PoddySettings
 )
 
 #target_include_directories(PoddySettings PRIVATE ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(PoddySettings PRIVATE PodMod ftxui::screen ftxui::dom ftxui::component)
+target_link_libraries(PodSettings PRIVATE PodMod ftxui::screen ftxui::dom ftxui::component)

@@ -15,6 +15,9 @@ target_sources(GpodXX
 #target_include_directories(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
 #target_link_libraries(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
 
+find_package(TagLib REQUIRED)
+target_link_libraries(GpodXX PRIVATE TagLib::TagLib)
+
 if (UNIX)
 find_package(PkgConfig REQUIRED)
 

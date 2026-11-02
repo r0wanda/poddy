@@ -4,28 +4,31 @@
 #include <string>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <finddev.hpp>
 
 using namespace ftxui;
 
-PoddyMain::PoddyMain(Poddy *pod): PodSettingsMod("iPod", pod) {
+PoddyMain::PoddyMain(PoddyPtr pod): PodSettingsMod("iPod", pod) {
 	loadMainMenu();
 	content = Container::Horizontal({
-		controls->Render(),
-		Renderer([] { return separator(); }),
-		mainMenu->Render(),
-		Renderer([] { return separator(); }),
-		info->Render()
+		Renderer(controls, [this] {
+			return hbox({ controls->Render(), separator() });
+		}),
+		Renderer(controls, [this] {
+			return hbox({ mainMenu->Render(), separator() });
+		}),
+		info
 	});
 }
 
-MenuEntryOption PoddyMain::menuEntryOpt(int i, const std::vector<GpodBasePtr> &menuItems) {
+MenuEntryOption PoddyMain::menuEntryOpt(GpodBasePtr item) {
 	MenuEntryOption option;
-	option.transform = [this](EntryState state) {
+	option.transform = [this, &item](EntryState state) {
 		state.label = (state.active ? "> " : "  ") + state.label;
 		Element e = text(state.label);
 		if (state.focused) {
 			e = e | inverted;
-			currentItem = menuItems.at(i + 2);
+			currentItem = item;
 		}
 		if (state.active) {
 			e = e | bold;
@@ -41,64 +44,63 @@ void PoddyMain::loadMainMenu() {
 	static int menuSel;
 	static int menuSortSel = 0;
 	menuSel = 0;
+	menuSortSel = 0;
 
 	// menu settings
-	static constexpr std::vector<std::string> tabVals{
+	static const std::vector<std::string> tabVals{
 		"Albums",
 		"Artists",
 		"Playlists",
 		"Tracks"
 	};
-	// backwards alphabetical
-	static bool azBackwards = false;
-	std::vector<const std::string> sortVals;
 
 	// menu settings components
-	static Toggle mainMenuToggle = Toggle(&tabVals, &menuToggleSel);
-	static Component container = Container::Tab();
-	std::vector<MenuEntry> menuEnts;
-	std::vector<GpodBasePtr> menuItems;
+	static Component mainMenuToggle = Toggle(&tabVals, &menuToggleSel);
+	std::vector<Component> menuEnts;
+	GpodSortContainerPtr menuItems;
 
 	switch (menuToggleSel) {
 	case 0:
-		menuItems = std::vector<GpodBasePtr>(gpod->albums.begin(), gpod->albums.end());
-		sortVals = GpodAlbum::
+		menuItems = gpod->albums;
 		break;
 	case 1:
-		menuItems = std::vector<GpodBasePtr>(gpod->artists.begin(), gpod->artists.end());
-		sortVals = gpod->albums.first()->sort;
+		menuItems = gpod->albums;
 		break;
 	case 2:
-		menuItems = std::vector<GpodBasePtr>(gpod->playlists.begin(), gpod->playlists.end());
-		sortVals = _sortVals.subspan(1, 3);
+		menuItems = gpod->playlists;
 		break;
-	case 3:
-		menuItems = std::vector<GpodBasePtr>(gpod->tracks.begin(), gpod->tracks.end());
-		break;
+	default:
+		menuItems = gpod->tracks;
 	}
 
 	// sort menu
-	auto menuSortDD = Dropdown(&sortVals, &menuSortSel)
-	auto menuToggleCont = Container::Horizontal({
+	const std::vector<std::string> sortKeys = menuItems->sortKeys();
+	Component menuSortDD = Dropdown(&sortKeys, &menuSortSel);
+	Component menuToggleCont = Container::Horizontal({
 		mainMenuToggle, menuSortDD
 	});
-	menuEnts.push_back(menuToggleCont);
-	menuEnts.push_back(Renderer([] { return separator(); }));
+	menuEnts.push_back(Renderer(menuToggleCont, [&menuToggleCont] {
+		return vbox({
+			menuToggleCont->Render(),
+			separator()
+		});
+	}));
 
-	for (GpodBasePtr &base : menuItems) {
-		menuEnts.push_back(MenuEntry(base->name, menuEntryOpt));
+	std::vector<GpodBasePtr> items = menuItems->get(sortKeys.at(menuSortSel));
+	for (GpodBasePtr &base : items) {
+		menuEnts.push_back(MenuEntry(base->name, menuEntryOpt(base)));
 	}
 	auto menu = Container::Vertical(menuEnts, &menuSel);
-	mainMenu = Renderer(menu, [&] {
+	mainMenu = Renderer(menu, [&menu] {
 		return menu->Render() | frame;
 	});
 }
 
 
-Poddy::Poddy(std::vector<PodMod> mods): tui(std::make_shared<Tui>(mods))modules(mods), findd(tui) {
+Poddy::Poddy(std::vector<PodModPtr> mods): tui(std::make_shared<Tui>(mods)), findd(std::make_shared<FindDev>(tui)), modules(mods) {
 	findIpod();
 }
 
 void Poddy::findIpod() {
-	tui->popup(findd.popup);
+	tui->popup(findd->popup);
 }

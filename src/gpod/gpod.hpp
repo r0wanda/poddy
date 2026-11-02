@@ -33,17 +33,25 @@ struct GpodSortItem {
  */
 typedef std::map<const std::string, GpodSortItem> GpodSortMap;
 
+enum class GpodBaseT {
+	Track,
+	Artist,
+	Album,
+	Playlist
+};
+
 /**
  * @brief gpod base class
  * 
  */
 class GpodBase : public PodUtil::GetPtr<GpodBase> {
 public:
-	GpodBase(std::shared_ptr<Gpod> gp);
-	GpodBase(std::string nm, std::shared_ptr<Gpod> gp);
-	GpodBase(std::string nm, std::string sortNm, std::shared_ptr<Gpod> gp);
-	const std::string name;
-	const std::string sortName;
+	GpodBase(GpodBaseT tp, std::shared_ptr<Gpod> gp);
+	GpodBase(GpodBaseT tp, std::string nm, std::shared_ptr<Gpod> gp);
+	GpodBase(GpodBaseT tp, std::string nm, std::string sortNm, std::shared_ptr<Gpod> gp);
+	const GpodBaseT type;
+	std::string name;
+	std::string sortName;
 	virtual std::string display() const;
 	GpodSortMap sort;
 	virtual ~GpodBase() = default;
@@ -57,7 +65,7 @@ private:
  * @brief lazy-sort gpodbase objects
  * 
  */
-class GpodSortContainer {
+class GpodSortContainer : public PodUtil::GetPtr<GpodSortContainer> {
 public:
 	GpodSortContainer(std::shared_ptr<Gpod> gp);
 	GpodSortContainer(std::vector<std::shared_ptr<GpodBase>> vec, std::shared_ptr<Gpod> gp);
@@ -66,6 +74,7 @@ public:
 	void sort(std::string key);
 	void addItem(std::shared_ptr<GpodBase> base);
 	void finalize();
+	std::vector<std::string> sortKeys() const;
 
 	std::string currentName;
 	bool ascending;
@@ -80,11 +89,16 @@ private:
 	std::shared_ptr<Gpod> gpod;
 };
 
+typedef std::shared_ptr<GpodSortContainer> GpodSortContainerPtr;
+
 
 class GpodArtwork : public GpodBase {
 public:
 
-	void write(GpodTrack *tr);
+	void write(std::shared_ptr<GpodTrack> tr);
+	explicit inline operator Itdb_Artwork*() {
+		return art;
+	}
 protected:
 	Itdb_Artwork *art = nullptr;
 };
@@ -136,6 +150,9 @@ public:
 	void setArtist(std::shared_ptr<GpodArtist> ar);
 	void setAlbum(std::shared_ptr<GpodAlbum> al);
 	std::string display() const override;
+	explicit inline operator Itdb_Track*() {
+		return track;
+	}
 protected:
 	Itdb_Track *track = nullptr;
 };
@@ -153,7 +170,7 @@ public:
 
 	std::string display() const override;
 protected:
-	void finalize();
+//	void finalize();
 };
 
 struct GpodArtistSort {
@@ -162,17 +179,17 @@ struct GpodArtistSort {
 
 class GpodArtist : public GpodBase {
 public:
-	GpodSortContainer tracks;
-	GpodSortContainer albums;
+	GpodSortContainerPtr tracks;
+	GpodSortContainerPtr albums;
 
 	GpodArtist(std::string n, std::string sortNm, std::shared_ptr<Gpod> gp);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 	void addAlbum(std::shared_ptr<GpodAlbum> al, bool addTracks = false);
 	std::optional<std::shared_ptr<GpodAlbum>> getAlbum(std::string name);
-	std::string display() const override;
-protected:
+	//std::string display() const override;
 	void finalize();
+protected:
 };
 
 #define GPODARTIST(b) GPODBASEPTR_CAST(b, GpodArtist)
@@ -180,6 +197,11 @@ protected:
 class GpodPlaylist : public GpodBase {
 public:
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
+	explicit inline operator Itdb_Playlist*() {
+		return plist;
+	}
+protected:
+	Itdb_Playlist *plist;
 };
 
 #define GPODPLAYLIST(b) GPODBASEPTR_CAST(b, GpodPlaylist)
@@ -187,9 +209,10 @@ public:
 
 class Gpod : public PodUtil::GetPtr<Gpod> {
 public:
-	GpodSortContainer tracks;
-	GpodSortContainer artists;
-	GpodSortContainer albums;
+	GpodSortContainerPtr tracks;
+	GpodSortContainerPtr artists;
+	GpodSortContainerPtr albums;
+	GpodSortContainerPtr playlists;
 	std::map<std::string, std::shared_ptr<GpodArtist>> artistMap;
 
 	Gpod(std::string dbPath, const std::function<void(GError*, bool)> &errH);

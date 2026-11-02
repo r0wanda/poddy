@@ -8,7 +8,7 @@
 
 using namespace ftxui;
 
-Tui::Tui(std::vector<PodMod> _tabs): app(nullptr), tabsC(), modules(_tabs), curTab(0) {
+Tui::Tui(std::vector<PodModPtr> _tabs): app(nullptr), tabsC(), modules(_tabs), curTab(0) {
 	/*std::vector<std::string> names;
 	for (const PodMod &pm : modules) {
 		tabsC.push_back(pm.content);
@@ -51,16 +51,14 @@ void Tui::error(std::string err) {
 }
 void Tui::error(std::string err, bool fatal) {
 	Render(*app, vbox({
-		text("Error") | hcenter,
+		text("error") | hcenter,
 		text(err) | size(HEIGHT, EQUAL, 5) | size(WIDTH, EQUAL, err.size() + 2) | border,
-		text(std::string("Press anything to ") + (fatal ? "exit" : "dismiss"))
+		text(std::string("press anything to ") + (fatal ? "exit" : "dismiss"))
 	}) | size(HEIGHT, GREATER_THAN, 5) | size(WIDTH, GREATER_THAN, err.size() + 2) | border | center);
 	app->Print();
 	if (fatal) exit(1);
 }
-PodMod Tui::getCurTab() {
-	return modules[curTab];
-}
-std::shared_ptr<Tui> Tui::getPtr() {
-	return shared_from_this();
+
+PodModPtr Tui::getCurTab() {
+	return modules.at(curTab);
 }

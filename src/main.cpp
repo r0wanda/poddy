@@ -1,5 +1,6 @@
 #include <vector>
 #include <locale>
+#include <memory>
 #include <iostream>
 #include <config.hpp>
 #include <poddy.hpp>
@@ -10,7 +11,7 @@ int main(int argc, char **argv) {
 	if (!startConfig()) {
 		return 1;
 	}
-	std::vector<PodModPtr> modules = { /*PoddyMain()*/ };
+	std::vector<PodModPtr> modules = { std::make_shared<PoddyMain>() };
 	Poddy poddy(modules);
 	return 0;
 }

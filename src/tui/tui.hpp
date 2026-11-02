@@ -1,26 +1,27 @@
 #pragma once
 #include <memory>
-#include <podmod.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/app.hpp>
 #include <ftxui/dom/elements.hpp>
+#include "../util.hpp"
+
+class PodMod;
 
 /**
  * extensible tui framework to manage and displat modules
  */
-class Tui : std::enable_shared_from_this<Tui> {
+class Tui : PodUtil::GetPtr<Tui> {
 public:
 	ftxui::App *app;
 	ftxui::Component renderer;
 	ftxui::Component container;
 	ftxui::Components tabsC;
-	std::vector<PodMod> modules;
-	Tui(std::vector<PodMod> _tabs);
+	std::vector<std::shared_ptr<PodMod>> modules;
+	Tui(std::vector<std::shared_ptr<PodMod>> _tabs);
 	void popup(ftxui::Component pop);
 	void error(std::string err);
 	void error(std::string err, bool fatal);
-	PodMod getCurTab();
-	std::shared_ptr<Tui> getPtr();
+	std::shared_ptr<PodMod> getCurTab();
 private:
 	int curTab;
 	ftxui::Component tabmenu;

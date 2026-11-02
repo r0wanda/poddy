@@ -6,7 +6,9 @@ set(CMAKE_CXX_STANDARD 26)
 
 add_executable(poddy)
 
-add_compile_options(-Wall -Wextra)
+add_compile_options(-Wall -Wextra -fdiagnostics-color=always)
+
+set(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "")
 
 if (APPLE)
 add_compile_definitions("IS_MACOS")
