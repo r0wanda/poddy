@@ -27,6 +27,7 @@ struct PodModWrap {
 typedef void (*dypodmod_t)(Poddy*);
 typedef void (*dypodmodclose_t)(PodMod*);
 class DyPodMod;
+// TODO change def of podmodptr
 class DyPodModDeleter {
 public:
 	DyPodModDeleter(DyPodMod *mod) {
