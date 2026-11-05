@@ -12,5 +12,8 @@ IndepPodMod::IndepPodMod(std::string _name): name(_name) {
 	if (!fs::exists(cachePath)) fs::create_directory(cachePath);
 }
 
+virtual void init(std::shared_ptr<Poddy> pod) {
+	
+}
 
 PodMod::PodMod(std::string _name, PoddyPtr pod): IndepPodMod::IndepPodMod(_name), poddy(pod) {}

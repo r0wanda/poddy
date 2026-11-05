@@ -22,6 +22,7 @@ public:
 	void error(std::string err);
 	void error(std::string err, bool fatal);
 	std::shared_ptr<PodMod> getCurTab();
+	PodUtil::ErrorQueuePtr errq;
 private:
 	int curTab;
 	ftxui::Component tabmenu;

@@ -13,6 +13,12 @@
 class Tui;
 class Poddy;
 
+class PodModContainer : public PodUtil::GetPtr<PodModContainer> {
+public:
+	IndepPodModPtr()
+	std::shared_ptr<PodMod>
+};
+
 /**
  * @brief podmod without window
  * 
@@ -26,6 +32,8 @@ public:
 	 * @param _name name of the module
 	 */
 	IndepPodMod(std::string _name);
+	virtual void init(std::shared_ptr<Poddy> pod);
+	virtual ~IndepPodMod() = default;
 protected:
 	std::filesystem::path configPath;
 	std::filesystem::path cachePath;
@@ -45,12 +53,12 @@ public:
 	 * @param _name name of the module
 	 * @param pod underlying poddy class
 	 */
-	PodMod(std::string _name, std::shared_ptr<Poddy> pod);
+	PodMod(std::string _name);
+	PodUtil::ErrorQueue errq;
 protected:
 	std::shared_ptr<Poddy> poddy;
 	GpodPtr gpod;
 	std::shared_ptr<Tui> tui;
 };
-typedef std::shared_ptr<PodMod> PodModPtr;
-typedef std::function<PodModPtr(std::shared_ptr<Poddy>)> PodModWrapper;
-#define WRAPPODMOD(base) [](std::shared_ptr<Poddy> pod) -> PodModPtr { return std::make_shared<base>(pod)->getPtr(); }
+//typedef std::function<PodModPtr(std::shared_ptr<Poddy>)> PodModWrapper;
+//#define WRAPPODMOD(base) [](std::shared_ptr<Poddy> pod) -> PodModPtr { return std::make_shared<base>(pod)->getPtr(); }
