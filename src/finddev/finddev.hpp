@@ -8,7 +8,7 @@
 #include <ftxui/dom/elements.hpp>
 #include <config.hpp>
 #include <tui.hpp>
-#include "../util.hpp"
+#include <util.hpp>
 
 #ifdef IS_LINUX
 #include <udisks/udisks.h>
@@ -48,13 +48,14 @@ public:
 	void start();
 	void stop();
 	void refresh();
+
 	ftxui::Component popup;
+	PodUtil::ErrorQueuePtr errq;
 	~FindDev();
 	friend class DiskDev;
 private:
 	TuiPtr tui;
 #ifdef IS_LINUX
-	GError *err;
 	UDisksClient *client;
 	GDBusObjectManager *manager;
 #endif
@@ -64,3 +65,4 @@ private:
 	std::jthread notifLoop;
 	void setupPopup();
 };
+typedef std::shared_ptr<FindDev> FindDevPtr;

@@ -41,7 +41,7 @@ static void deviceChange([[ maybe_unused ]] GDBusObjectManager *manager, [[ mayb
 	FindDev *dev = static_cast<FindDev*>(data);
 	dev->refresh();
 }
-static void notifWorker(std::stop_token tok, FindDev *findd, TuiPtr tui) {
+static void notifWorker(std::stop_token tok, FindDev *findd) {
 	GMainContext *ctx = g_main_context_new();
 	g_main_context_push_thread_default(ctx);
 	GError *err = nullptr;
@@ -50,9 +50,8 @@ static void notifWorker(std::stop_token tok, FindDev *findd, TuiPtr tui) {
 	std::stop_callback cb(tok, [ctx] {
 		g_main_context_wakeup(ctx);
 	});
-	if (err != nullptr) {
-		tui->error(err->message);
-		g_error_free(err);
+	if (err) {
+		findd->errq->error(err->message);
 		goto workerCleanup;
 	}
 
@@ -69,19 +68,15 @@ static void notifWorker(std::stop_token tok, FindDev *findd, TuiPtr tui) {
 	g_main_context_unref(ctx);
 }
 
-FindDev::FindDev(TuiPtr _tui): tui(_tui),
+FindDev::FindDev(TuiPtr _tui): tui(_tui), menuSel(0) {
 #ifdef IS_LINUX
-err(nullptr),
-#endif
-menuSel(0) {
-#ifdef IS_LINUX
+	GError *err = nullptr;
     client = udisks_client_new_sync(nullptr, &err);
     
-    if (err != nullptr) {
-		// TODO: error system
-        std::cerr << err->message << std::endl;
-        g_clear_error(&err);
-    }
+    if (err) {
+		errq->error(err, true);
+		return;
+	}
 
     manager = udisks_client_get_object_manager(client);
 #endif
@@ -217,14 +212,13 @@ std::string DiskDev::connect() {
 
 	gchar *mountPath;
 	std::string mnt;
-	GError *err = findd->err;
+	GError *err = nullptr;
 
 	if (udisks_filesystem_call_mount_sync(dev, opt, &mountPath, NULL, &err)) {
 		mnt = mountPath;
 		g_free(mountPath);
 	} else {
-		std::cerr << err->message << std::endl;
-        g_clear_error(&err);
+		findd->errq->error(err);
 		return "";
 	}
 #endif

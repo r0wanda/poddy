@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
 #include <tui.hpp>
+#include <util.hpp>
 #include <gpod.hpp>
 #include <podmod.hpp>
+#include <manager.hpp>
 #include <settings.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
@@ -30,13 +32,14 @@ private:
 	ftxui::Component info;
 };
 
-class Poddy {
+class Poddy : public PodUtil::GetPtr<Poddy> {
 public:
 	TuiPtr tui;
 	GpodPtr gpod;
 	std::shared_ptr<FindDev> findd;
-	std::vector<PodModPtr> modules;
-	Poddy(std::vector<PodModPtr> mods);
+	ModManagerPtr modules;
+	PodUtil::ErrorQueuePtr errq;
+	Poddy(std::vector<PodModWrapper> mods);
 	void findIpod();
 };
 

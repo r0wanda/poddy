@@ -15,15 +15,34 @@ bool GpodSortItem::compare(const GpodSortItem &it) {
 	return trackN > it.trackN;
 }
 
-GpodBase::GpodBase(GpodBaseT tp, GpodPtr gp): type(tp), name(""), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
+constexpr std::string GpodBase::typeStr(Type tp) {
+	switch (tp) {
+	case Type::Track:
+		return "track";
+	case Type::Artist:
+		return "artist";
+	case Type::Album:
+		return "album";
+	case Type::Playlist:
+		return "playlist";
+	default:
+		return "unknown";
+	};
 }
-GpodBase::GpodBase(GpodBaseT tp, std::string nm, GpodPtr gp): type(tp), name(nm), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
+GpodBase::GpodBase(Type tp, GpodPtr gp): type(tp), name(""), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
 }
-GpodBase::GpodBase(GpodBaseT tp, std::string nm, std::string sortNm, GpodPtr gp): type(tp), name(nm), sortName(sortNm), sort({{"Name", { sortName, true }}}), gpod(gp) {
+GpodBase::GpodBase(Type tp, std::string nm, GpodPtr gp): type(tp), name(nm), sortName(name), sort({{"Name", { sortName, true }}}), gpod(gp) {
+}
+GpodBase::GpodBase(Type tp, std::string nm, std::string sortNm, GpodPtr gp): type(tp), name(nm), sortName(sortNm), sort({{"Name", { sortName, true }}}), gpod(gp) {
 }
 
 std::string GpodBase::display() const {
 	return name;
+}
+void GpodBase::errQInit() {
+	std::string nm = "\"" + name + "\" ";
+	nm += typeStr(type);
+	errq = std::make_shared<PodUtil::ErrorQueue>(nm, gpod->errq);
 }
 
 // macro to assign track properties
@@ -53,19 +72,19 @@ GpodTrackPlayData::GpodTrackPlayData(Itdb_Track *tr):
 	_gts(playcount), recentPlaycount(tr->recent_playcount), ts(tr->time_played) {}
 #undef _gts
 
-GpodTrack::GpodTrack(Itdb_Track *tr, GpodPtr gp): GpodBase::GpodBase(GpodBaseT::Track, tr->title, gp), playData(tr), trackData(tr) {
+GpodTrack::GpodTrack(Itdb_Track *tr, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Track, tr->title, gp), playData(tr), trackData(tr) {
 	sort.insert({"Artist", { "", true }});
 	sort.insert({"Album", { "", true, static_cast<int>(trackData.trackN) }});
 	sort.insert({"Release Date", { std::to_string(tr->year), false }});
 	sort.insert({"Most Played", { std::to_string(tr->playcount), false }});
 	sort.insert({"Recently Played", { std::to_string(tr->time_played), false }});
 }
-GpodTrack::GpodTrack(TagLib::FileRef ref, GpodPtr gp): GpodBase::GpodBase(GpodBaseT::Track, gp) {
+GpodTrack::GpodTrack(TagLib::FileRef ref, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Track, gp) {
 	TagLib::Tag *tag = ref.tag();
 	Itdb_Track *tr = itdb_track_new();
 	if (tag == NULL) {
 		// TODO: handle incomplete gpodtracks
-		gp->throwG("file has no tags", false);
+		errq->error("file has no tags");
 		return;
 	}
 }
@@ -82,7 +101,7 @@ std::string GpodTrack::display() const {
 	return artist->name + " - " + name;
 }
 
-GpodAlbum::GpodAlbum(std::string n, std::string sortNm, int year, GpodArtistPtr arst, GpodPtr gp): GpodBase::GpodBase(GpodBaseT::Album, n, sortNm, gp), artist(arst) {
+GpodAlbum::GpodAlbum(std::string n, std::string sortNm, int year, GpodArtistPtr arst, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Album, n, sortNm, gp), artist(arst) {
 	artist->addAlbum(getPtr<GpodAlbum>());
 	sort.insert({"Artist", { artist->sortName, true }});
 	sort.insert({"Release Date", { std::to_string(year), false }});
@@ -106,7 +125,7 @@ std::string GpodAlbum::display() const {
 	return artist->name + " - " + name;
 }
 
-GpodArtist::GpodArtist(std::string n, std::string sortNm, GpodPtr gp): GpodBase::GpodBase(GpodBaseT::Artist, n, sortNm, gp),
+GpodArtist::GpodArtist(std::string n, std::string sortNm, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Artist, n, sortNm, gp),
 tracks(std::make_shared<GpodSortContainer>(gp)), albums(std::make_shared<GpodSortContainer>(gp)) {
 	sort.insert({"Most Played", { "0", false }});
 	sort.insert({"Recently Played", { "0", false }});
@@ -148,8 +167,10 @@ void GpodArtist::finalize() {
 
 
 // gpod sort container
-GpodSortContainer::GpodSortContainer(GpodPtr gp): finalized(false), gpod(gp) {}
-GpodSortContainer::GpodSortContainer(std::vector<GpodBasePtr> vec, GpodPtr gp): items(vec), finalized(true), gpod(gp) {
+GpodSortContainer::GpodSortContainer(GpodPtr gp): finalized(false), gpod(gp),
+	errq(std::make_shared<PodUtil::ErrorQueue>("sort menu", gpod->errq)) {}
+GpodSortContainer::GpodSortContainer(std::vector<GpodBasePtr> vec, GpodPtr gp): items(vec), finalized(true), gpod(gp),
+	errq(std::make_shared<PodUtil::ErrorQueue>("sort menu", gpod->errq)) {
 	for (const auto &p : items.at(0)->sort) {
 		sorts.insert({p.first, {}});
 	}
@@ -157,7 +178,7 @@ GpodSortContainer::GpodSortContainer(std::vector<GpodBasePtr> vec, GpodPtr gp): 
 
 std::vector<GpodBasePtr> GpodSortContainer::get(std::string key) {
 	if (!sorts.contains(key)) {
-		gpod->throwG("invalid sort type", false);
+		errq->error("invalid sort type");
 		return std::vector<GpodBasePtr>();
 	}
 	
@@ -206,18 +227,20 @@ std::vector<std::string> GpodSortContainer::sortKeys() const {
 }
 
 // gpod main class
-Gpod::Gpod(std::string dbPath, const std::function<void(GError*, bool)> &errH):
+Gpod::Gpod(std::string dbPath):
 tracks(std::make_shared<GpodSortContainer>(getPtr())), artists(std::make_shared<GpodSortContainer>(getPtr())), albums(std::make_shared<GpodSortContainer>(getPtr())),
-path(dbPath), errHandle(errH), err(nullptr) {
+path(dbPath) {
+	GError *err = nullptr;
     itdb = itdb_parse(path.c_str(), &err);
-	throwG(true);
+	if (err) errq->error(err);
 }
 
 void Gpod::addTrack(GpodTrackPtr tr) {
 	tracks->addItem(tr);
 }
 void Gpod::addArtist(GpodArtistPtr ar) {
-	if (artistMap.contains(ar->name)) throwG("duplicate artist", false);
+	// TODO: merge artists if duplicate?
+	if (artistMap.contains(ar->name)) errq->error("duplicate artist");
 	artists->addItem(ar);
 	artistMap[ar->name] = ar;
 }
@@ -272,23 +295,6 @@ void Gpod::process(std::function<void(int)> perCb) {
 		ar->getPtr<GpodArtist>()->finalize();
 	}
 	albums->finalize();
-}
-
-void Gpod::throwG(bool fatal) {
-	if (!err) return;
-	if (err->message) errHandle(err, fatal);
-	g_error_free(err);
-	err = nullptr;
-}
-void Gpod::throwG(GError **e, bool fatal) {
-	if ((*e)->message) errHandle(*e, fatal);
-	g_error_free(*e);
-	*e = nullptr;
-}
-void Gpod::throwG(std::string e, bool fatal) {
-	GError *gerr = g_error_new(g_option_error_quark(), 1, e.c_str());
-	errHandle(gerr, fatal);
-	g_error_free(gerr);
 }
 
 Gpod::~Gpod() {

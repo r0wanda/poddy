@@ -2,9 +2,11 @@
 #include <poddy.hpp>
 #include <config.hpp>
 #include <tui.hpp>
+#include <poddy.hpp>
 namespace fs = std::filesystem;
 
-IndepPodMod::IndepPodMod(std::string _name): name(_name) {
+IndepPodMod::IndepPodMod(std::string _name, std::shared_ptr<Poddy> pod): name(_name),
+	errq(std::make_shared<PodUtil::ErrorQueue>(name, pod->errq)), poddy(pod), gpod(poddy->gpod), tui(poddy->tui) {
 	startConfig();
 	configPath = configDir / name;
 	cachePath = cacheDir / name;
@@ -12,8 +14,5 @@ IndepPodMod::IndepPodMod(std::string _name): name(_name) {
 	if (!fs::exists(cachePath)) fs::create_directory(cachePath);
 }
 
-virtual void init(std::shared_ptr<Poddy> pod) {
-	
-}
 
-PodMod::PodMod(std::string _name, PoddyPtr pod): IndepPodMod::IndepPodMod(_name), poddy(pod) {}
+PodMod::PodMod(std::string _name, PoddyPtr pod): IndepPodMod::IndepPodMod(_name, pod) {}

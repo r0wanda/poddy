@@ -3,9 +3,19 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/app.hpp>
 #include <ftxui/dom/elements.hpp>
-#include "../util.hpp"
+#include <util.hpp>
 
 class PodMod;
+class Tui;
+class Poddy;
+
+class TuiErrorQueue : public PodUtil::ErrorQueue {
+public:
+	TuiErrorQueue(std::shared_ptr<Tui> tuiPtr);
+	void error(PodUtil::ErrQ err) override;
+private:
+	std::shared_ptr<Tui> tui;
+};
 
 /**
  * extensible tui framework to manage and displat modules
@@ -17,13 +27,13 @@ public:
 	ftxui::Component container;
 	ftxui::Components tabsC;
 	std::vector<std::shared_ptr<PodMod>> modules;
-	Tui(std::vector<std::shared_ptr<PodMod>> _tabs);
+	Tui(std::shared_ptr<Poddy> pod);
 	void popup(ftxui::Component pop);
-	void error(std::string err);
-	void error(std::string err, bool fatal);
+	void dispError(PodUtil::ErrQ err);
 	std::shared_ptr<PodMod> getCurTab();
 	PodUtil::ErrorQueuePtr errq;
 private:
+	std::shared_ptr<Poddy> poddy;
 	int curTab;
 	ftxui::Component tabmenu;
 	ftxui::Component toggle;

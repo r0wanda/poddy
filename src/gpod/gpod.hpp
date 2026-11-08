@@ -12,7 +12,7 @@
 #include <gpod/itdb.h>
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
-#include "../util.hpp"
+#include <util.hpp>
 
 
 class GpodArtist;
@@ -33,36 +33,38 @@ struct GpodSortItem {
  */
 typedef std::map<const std::string, GpodSortItem> GpodSortMap;
 
-enum class GpodBaseT {
-	Track,
-	Artist,
-	Album,
-	Playlist
-};
-
 /**
  * @brief gpod base class
  * 
  */
 class GpodBase : public PodUtil::GetPtr<GpodBase> {
 public:
-	GpodBase(GpodBaseT tp, std::shared_ptr<Gpod> gp);
-	GpodBase(GpodBaseT tp, std::string nm, std::shared_ptr<Gpod> gp);
-	GpodBase(GpodBaseT tp, std::string nm, std::string sortNm, std::shared_ptr<Gpod> gp);
-	const GpodBaseT type;
+	enum Type {
+		Track,
+		Artist,
+		Album,
+		Playlist
+	};
+	static constexpr std::string typeStr(Type tp);
+	GpodBase(Type tp, std::shared_ptr<Gpod> gp);
+	GpodBase(Type tp, std::string nm, std::shared_ptr<Gpod> gp);
+	GpodBase(Type tp, std::string nm, std::string sortNm, std::shared_ptr<Gpod> gp);
+	const Type type;
 	std::string name;
 	std::string sortName;
 	virtual std::string display() const;
 	GpodSortMap sort;
 	virtual ~GpodBase() = default;
+	PodUtil::ErrorQueuePtr errq;
 
 	friend class Gpod;
 private:
 	std::shared_ptr<Gpod> gpod = nullptr;
+	void errQInit();
 };
 
 /**
- * @brief lazy-sort gpodbase objects
+ * @brief sort gpodbase objects
  * 
  */
 class GpodSortContainer : public PodUtil::GetPtr<GpodSortContainer> {
@@ -79,6 +81,7 @@ public:
 	std::string currentName;
 	bool ascending;
 	std::vector<std::shared_ptr<GpodBase>> items;
+	PodUtil::ErrorQueuePtr errq;
 	
 	friend class Gpod;
 	friend class GpodBase;
@@ -215,13 +218,14 @@ public:
 	GpodSortContainerPtr playlists;
 	std::map<std::string, std::shared_ptr<GpodArtist>> artistMap;
 
-	Gpod(std::string dbPath, const std::function<void(GError*, bool)> &errH);
+	Gpod(std::string dbPath);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 	void addArtist(std::shared_ptr<GpodArtist> ar);
 	void addAlbum(std::shared_ptr<GpodAlbum> al);
 	void process(std::function<void(int)> perCb);
 
+	PodUtil::ErrorQueuePtr errq;
 	~Gpod();
 
 	friend class GpodTrack;
@@ -231,12 +235,7 @@ public:
 	friend class GpodSortContainer;
 protected:
 	Itdb_iTunesDB *itdb = nullptr;
-	void throwG(bool fatal);
-	void throwG(GError **e, bool fatal);
-	void throwG(std::string e, bool fatal);
 	std::string path;
-	const std::function<void(GError*, bool)> &errHandle;
-	GError *err;
 };
 
 typedef std::shared_ptr<Gpod> GpodPtr;

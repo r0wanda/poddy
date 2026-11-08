@@ -49,25 +49,18 @@ public:
 	PodSettings(std::string _name);
 protected:
 	std::filesystem::path settingsPath;
-	template <typename T>
-	void writeConfig(const T &strct) {
-		nlohmann::json j = strct;
+	nlohmann::json config;
+	void writeConfig() {
 		std::ofstream strm(settingsPath);
-		strm << j;
+		strm << config;
 		strm.close();
 	}
-	template <typename T>
-	T loadConfig() {
-		try {
-			std::ifstream strm(settingsPath);
-			nlohmann::json j;
-			strm >> j;
-			strm.close();
-			return j.get<T>();
-		} catch (...) {
-			// TODO: err handling
-			return T();
-		}
+	void loadConfig() {
+		std::ifstream strm(settingsPath);
+		nlohmann::json j;
+		strm >> j;
+		strm.close();
+		config = j;
 	}
 };
 

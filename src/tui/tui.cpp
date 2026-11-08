@@ -1,4 +1,5 @@
-#include <tui.hpp>
+#include "tui.hpp"
+#include <poddy.hpp>
 #include <podmod.hpp>
 #include <vector>
 #include <string>
@@ -8,7 +9,13 @@
 
 using namespace ftxui;
 
-Tui::Tui(std::vector<PodModPtr> _tabs): app(nullptr), tabsC(), modules(_tabs), curTab(0) {
+TuiErrorQueue::TuiErrorQueue(std::shared_ptr<Tui> tuiPtr): ErrorQueue::ErrorQueue("poddy"), tui(tuiPtr) {}
+void TuiErrorQueue::error(PodUtil::ErrQ err) {
+	if (!err.errq) err.errq = getPtr();
+	tui->dispError(err);
+}
+
+Tui::Tui(std::shared_ptr<Poddy> pod): app(nullptr), tabsC(), errq(std::make_shared<TuiErrorQueue>(getPtr())), poddy(pod), modules(poddy->modules), curTab(0) {
 	/*std::vector<std::string> names;
 	for (const PodMod &pm : modules) {
 		tabsC.push_back(pm.content);
@@ -46,17 +53,14 @@ void Tui::popup(ftxui::Component pop) {
 	app->Loop(renderer);
 	//std::getchar();
 }
-void Tui::error(std::string err) {
-	error(err, false);
-}
-void Tui::error(std::string err, bool fatal) {
+void Tui::dispError(PodUtil::ErrQ err) {
 	Render(*app, vbox({
-		text("error") | hcenter,
-		text(err) | size(HEIGHT, EQUAL, 5) | size(WIDTH, EQUAL, err.size() + 2) | border,
-		text(std::string("press anything to ") + (fatal ? "exit" : "dismiss"))
-	}) | size(HEIGHT, GREATER_THAN, 5) | size(WIDTH, GREATER_THAN, err.size() + 2) | border | center);
+		text(err.errq->name + " error") | hcenter,
+		text(err.msg) | size(HEIGHT, EQUAL, 5) | size(WIDTH, EQUAL, err.msg.size() + 2) | border,
+		text(std::string("press anything to ") + (err.fatal ? "exit" : "dismiss"))
+	}) | size(HEIGHT, GREATER_THAN, 5) | size(WIDTH, GREATER_THAN, err.msg.size() + 2) | border | center);
 	app->Print();
-	if (fatal) exit(1);
+	if (err.fatal) exit(1);
 }
 
 PodModPtr Tui::getCurTab() {
