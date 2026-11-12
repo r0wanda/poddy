@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <functional>
 #include <filesystem>
 #include <util.hpp>
 #include "podmod.hpp"
@@ -43,18 +44,19 @@ private:
 };
 typedef std::shared_ptr<DyPodMod> DyPodModPtr;
 
-class ModManager : public PodSettingsMod {
+typedef std::function<bool(const std::string&, const std::string&)> _PodModComp;
+class ModManager : public PodSettings {
 public:
-	ModManager(std::shared_ptr<Tui> tui);
+	ModManager(std::shared_ptr<Poddy> pod, SettingsIfacePtr siface);
 	void loadModule(PodModPtr mod) {
 		
 	}
 	void loadExternal(std::string path);
-	void addSelf() {
-		mods.push_back(getPtr<PodMod>());
-	}
-	std::vector<PodModPtr> tabs;
-	std::vector<IndepPodModPtr> mods;
+	void addTab(PodModPtr tab);
+	std::map<std::string, PodModPtr, _PodModComp> tabs;
 private:
+	std::vector<std::string> order;
+	bool compTabs(const std::string &a, const std::string &b) const;
+	SettingsIfacePtr settings;
 	std::vector<DyPodModPtr> externs;
 };

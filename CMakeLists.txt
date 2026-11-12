@@ -23,10 +23,13 @@ target_sources(poddy
 		src/main.cpp
 )
 
+include(tools/json2hpp.cmake)
 add_subdirectory(external/miniz)
 add_subdirectory(external/ftxui)
 add_subdirectory(external/curlpp)
 add_subdirectory(external/nlohmann)
+add_subdirectory(external/json-schema-validator)
+add_subdirectory(external/semver)
 add_subdirectory(src/util)
 add_subdirectory(src/config)
 add_subdirectory(src/podmod)

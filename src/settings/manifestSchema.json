@@ -1,0 +1,31 @@
+{
+	"$schema": "http://json-schema.org/draft/2020-12/schema#",
+	"title": "poddy manifest",
+	"properties": {
+		"url": {
+			"description": "url of the manifest",
+			"type": "string"
+		},
+		"version": {
+			"description": "version of the manifest (semver)",
+			"type": "string"
+		},
+		"zip": {
+			"description": "url of the module the manifest is describing",
+			"type": "string"
+		},
+		"website": {
+			"description": "url of the module's homepage",
+			"type": "string"
+		},
+		"name": {
+			"description": "module name",
+			"type": "string"
+		},
+		"description": {
+			"description": "module description",
+			"type": "string"
+		}
+	},
+	"required": ["url", "version", "zip", "name"]
+}

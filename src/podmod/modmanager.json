@@ -1,0 +1,23 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Mod Manager",
+	"properties": {
+		"manifests": {
+			"description": "urls of manifests for external modules",
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"default": []
+		},
+		"order": {
+			"description": "order of tabs",
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"default": ["iPod", "files", "settings"]
+		}
+	},
+	"required": []
+}

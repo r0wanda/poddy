@@ -38,3 +38,7 @@ void ErrorQueue::setParent(std::shared_ptr<ErrorQueue> errq) {
 		}
 	}
 }
+
+// https://stackoverflow.com/a/3809435 CC BY-SA 4.0
+const std::regex Regex::url{"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"};
+const std::regex Regex::httpUrl{"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"};

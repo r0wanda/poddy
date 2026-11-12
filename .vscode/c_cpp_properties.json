@@ -17,9 +17,13 @@
                 "${workspaceFolder}/external/ftxui/include",
                 "/usr/include/udisks2",
                 "${workspaceFolder}/build/src",
-				"${workspaceFolder}/src/**"
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/external/json-schema-validator/src",
+                "${workspaceFolder}/external/semver/include"
             ],
-            "defines": ["IS_LINUX"],
+            "defines": [
+                "IS_LINUX"
+            ],
             "compilerPath": "/usr/bin/gcc"
         }
     ],

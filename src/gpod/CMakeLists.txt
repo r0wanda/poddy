@@ -24,8 +24,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBGPOD REQUIRED libgpod-1.0)
 
 target_include_directories(GpodXX PUBLIC ${LIBGPOD_INCLUDE_DIRS})
-target_compile_options(GpodXX PRIVATE PodUtil ${LIBGPOD_CFLAGS_OTHER})
-target_link_libraries(GpodXX PRIVATE ${LIBGPOD_LIBRARIES})
+target_compile_options(GpodXX PRIVATE ${LIBGPOD_CFLAGS_OTHER})
+target_link_libraries(GpodXX PRIVATE PodUtil ${LIBGPOD_LIBRARIES})
 endif()
 
 #target_include_directories(GpodXX PUBLIC ${CMAKE_CURRENT_LIST_DIR})

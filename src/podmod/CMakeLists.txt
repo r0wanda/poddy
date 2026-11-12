@@ -11,6 +11,7 @@ target_sources(PodMod
 		FILES
 			podmod.hpp
 )
+gen_json(PodMod modmanager modmanager.json)
 
 #target_include_directories(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)
 target_link_libraries(PodMod PUBLIC PoddyConfig GpodXX PoddyTui PoddyMain PRIVATE ftxui::screen ftxui::dom ftxui::component miniz)

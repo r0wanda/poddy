@@ -1,9 +1,9 @@
 #pragma once
+#include <regex>
 #include <memory>
 #include <string>
 #include <vector>
 #include <glib.h>
-#include <type_traits>
 
 namespace PodUtil {
 	template <typename Base>
@@ -11,7 +11,6 @@ namespace PodUtil {
 	public:
 		template <typename T = Base>
 		std::shared_ptr<T> getPtr() {
-			static_assert(std::is_base_of_v<Base, T>);
 			return std::dynamic_pointer_cast<T>(this->shared_from_this());
 		}
 		virtual ~GetPtr() = default;
@@ -43,4 +42,9 @@ namespace PodUtil {
 		std::shared_ptr<ErrorQueue> parent;
 	};
 	typedef std::shared_ptr<ErrorQueue> ErrorQueuePtr;
+
+	namespace Regex {
+		const std::regex url;
+		const std::regex httpUrl;
+	};
 };

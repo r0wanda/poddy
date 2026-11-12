@@ -5,7 +5,7 @@
 #include <poddy.hpp>
 namespace fs = std::filesystem;
 
-IndepPodMod::IndepPodMod(std::string _name, std::shared_ptr<Poddy> pod): name(_name),
+IndepPodMod::IndepPodMod(std::string _name, PoddyPtr pod): name(_name),
 	errq(std::make_shared<PodUtil::ErrorQueue>(name, pod->errq)), poddy(pod), gpod(poddy->gpod), tui(poddy->tui) {
 	startConfig();
 	configPath = configDir / name;
@@ -15,4 +15,4 @@ IndepPodMod::IndepPodMod(std::string _name, std::shared_ptr<Poddy> pod): name(_n
 }
 
 
-PodMod::PodMod(std::string _name, PoddyPtr pod): IndepPodMod::IndepPodMod(_name, pod) {}
+//PodMod::PodMod(std::string _name, PoddyPtr pod): IndepPodMod::IndepPodMod(_name, pod) {}

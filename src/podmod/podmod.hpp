@@ -26,7 +26,7 @@ public:
 	 * @param _name name of the module
 	 */
 	IndepPodMod(std::string _name, std::shared_ptr<Poddy> pod);
-	PodUtil::ErrorQueue errq;
+	PodUtil::ErrorQueuePtr errq;
 	virtual ~IndepPodMod() = default;
 protected:
 	std::filesystem::path configPath;
@@ -41,7 +41,7 @@ typedef std::shared_ptr<IndepPodMod> IndepPodModPtr;
  * @brief module with window
  * 
  */
-class PodMod : public IndepPodMod {
+class PodMod : public virtual IndepPodMod {
 public:
 	ftxui::Component content;
 	/**
@@ -50,10 +50,11 @@ public:
 	 * @param _name name of the module
 	 * @param pod underlying poddy class
 	 */
-	PodMod(std::string _name);
+	//PodMod(std::string _name, std::shared_ptr<Poddy> pod);
 	virtual ~PodMod() = default;
 protected:
 };
 typedef std::shared_ptr<PodMod> PodModPtr;
 typedef std::function<PodModPtr(std::shared_ptr<Poddy>)>& PodModWrapper;
+typedef std::function<IndepPodModPtr(std::shared_ptr<Poddy>)>& IndepPodModWrapper;
 #define WRAPPODMOD(base) [](std::shared_ptr<Poddy> pod) -> PodModPtr { return std::make_shared<base>(pod)->getPtr(); }

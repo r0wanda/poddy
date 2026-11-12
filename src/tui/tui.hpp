@@ -17,6 +17,12 @@ private:
 	std::shared_ptr<Tui> tui;
 };
 
+class ProgressBar {
+public:
+
+};
+typedef std::shared_ptr<ProgressBar> ProgressBarPtr;
+
 /**
  * extensible tui framework to manage and displat modules
  */
@@ -27,12 +33,14 @@ public:
 	ftxui::Component container;
 	ftxui::Components tabsC;
 	std::vector<std::shared_ptr<PodMod>> modules;
+	std::vector<ProgressBarPtr> prog;
 	Tui(std::shared_ptr<Poddy> pod);
 	void popup(ftxui::Component pop);
 	void dispError(PodUtil::ErrQ err);
 	std::shared_ptr<PodMod> getCurTab();
 	PodUtil::ErrorQueuePtr errq;
 private:
+	ProgressBarPtr totalProg;
 	std::shared_ptr<Poddy> poddy;
 	int curTab;
 	ftxui::Component tabmenu;
