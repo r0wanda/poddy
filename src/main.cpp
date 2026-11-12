@@ -2,13 +2,13 @@
 #include <locale>
 #include <memory>
 #include <iostream>
-#include <config.hpp>
+#include <util.hpp>
 #include <poddy.hpp>
 #include <podmod.hpp>
 
 int main(int argc, char **argv) {
 	std::setlocale(LC_ALL, "");
-	if (!startConfig()) {
+	if (!PodUtil::startConfig()) {
 		return 1;
 	}
 	std::vector<PodModPtr> modules = { std::make_shared<PoddyMain>() };

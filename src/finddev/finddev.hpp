@@ -6,7 +6,6 @@
 #include <thread>
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
-#include <config.hpp>
 #include <tui.hpp>
 #include <util.hpp>
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <ftxui/screen/color.hpp>
-#include <config.hpp>
+#include <util.hpp>
 
 #ifdef IS_LINUX
 #include <udisks/udisks.h>

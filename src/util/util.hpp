@@ -4,8 +4,15 @@
 #include <string>
 #include <vector>
 #include <glib.h>
+#include <filesystem>
 
 namespace PodUtil {
+	bool startConfig();
+	static std::filesystem::path homeDir;
+	static std::filesystem::path cacheDir;
+	static std::filesystem::path configDir;
+	static std::filesystem::path musicDir;
+
 	template <typename Base>
 	class GetPtr : public std::enable_shared_from_this<Base> {
 	public:

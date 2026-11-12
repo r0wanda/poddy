@@ -13,4 +13,4 @@ target_sources(PoddyMain
 )
 
 
-target_link_libraries(PoddyMain PRIVATE PoddyConfig ftxui::screen ftxui::dom ftxui::component FindDev PUBLIC PoddyTui GpodXX PodMod PodSettings)
+target_link_libraries(PoddyMain PRIVATE PodUtil ftxui::screen ftxui::dom ftxui::component FindDev PUBLIC PoddyTui GpodXX PodMod PodSettings)

@@ -10,6 +10,9 @@
 [submodule "external/nlohmann"]
 	path = external/nlohmann
 	url = https://github.com/nlohmann/json.git
+[submodule "external/json-schema-validator"]
+	path = external/json-schema-validator
+	url = https://github.com/pboettch/json-schema-validator.git
 [submodule "external/semver"]
 	path = external/semver
 	url = https://github.com/Neargye/semver.git

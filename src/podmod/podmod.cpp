@@ -1,15 +1,14 @@
 #include "podmod.hpp"
 #include <poddy.hpp>
-#include <config.hpp>
 #include <tui.hpp>
 #include <poddy.hpp>
+#include <util.hpp>
 namespace fs = std::filesystem;
 
 IndepPodMod::IndepPodMod(std::string _name, PoddyPtr pod): name(_name),
 	errq(std::make_shared<PodUtil::ErrorQueue>(name, pod->errq)), poddy(pod), gpod(poddy->gpod), tui(poddy->tui) {
-	startConfig();
-	configPath = configDir / name;
-	cachePath = cacheDir / name;
+	configPath = PodUtil::configDir / name;
+	cachePath = PodUtil::cacheDir / name;
 	if (!fs::exists(configPath)) fs::create_directory(configPath);
 	if (!fs::exists(cachePath)) fs::create_directory(cachePath);
 }
