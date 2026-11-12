@@ -8,8 +8,6 @@
 namespace fs = std::filesystem;
 
 Cache::Cache(): initdbts(0) {
-	// TODO: cross-platform
-	const char *home = std::getenv("XDG_CONFIG_HOME");
 	path = fs::path(home) / ".lastpod";
 	ignPath = fs::path(home) / ".lastpodignore";
 	read();
