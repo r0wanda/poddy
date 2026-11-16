@@ -34,6 +34,7 @@ namespace PodUtil {
 		std::shared_ptr<ErrorQueue> errq;
 		const std::string msg;
 		bool fatal;
+		bool warning;
 	};
 	class ErrorQueue : public GetPtr<ErrorQueue> {
 	public:
@@ -42,6 +43,7 @@ namespace PodUtil {
 		ErrorQueue(std::string nm, std::shared_ptr<ErrorQueue> padre);
 		virtual void error(ErrQ err);
 		virtual void error(ErrQ err, bool fatal);
+		void warn(ErrQ err);
 		void setParent(std::shared_ptr<ErrorQueue> queue);
 		virtual ~ErrorQueue() = default;
 	protected:

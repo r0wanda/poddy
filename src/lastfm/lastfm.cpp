@@ -149,45 +149,49 @@ void Lastfm::login() {
 	std::cout << "logged in as " << session["session"]["name"] << std::endl;
 }
 
-int scrobble(std::vector<GpodTrackPtr> tracks) {
+LastfmResponse Lastfm::scrobble(const std::vector<const GpodTrackPtr> &tracks, const std::vector<unsigned long> &tss) {
 	std::map<std::string, std::string> body;
+	if (tracks.size() != tss.size()) {
+		errq->error("invalid scrobble batch");
+		return LastfmResponse{tracks.size(), 0};
+	}
+	LastfmResponse report;
 	int i = 0;
-	for (GpodTrackPtr &sc : tracks) {
+	for (const GpodTrackPtr &sc : tracks) {
 		if (i == 50) {
-			std::cerr << "too many tracks in one batch" << std::endl;
+			errq->warn("too many tracks in one batch");
+			report.ignored += sc.size() - 50;
 			break;
 		}
 		body[scrobbleI(i, "artist")] = std::string(sc->artist->name);
 		body[scrobbleI(i, "track")] = std::string(sc->title);
-		body[scrobbleI(i, "timestamp")] = std::to_string(sc->ts);
+		body[scrobbleI(i, "timestamp")] = std::to_string(tss.at(i));
 		body[scrobbleI(i, "album")] = std::string(sc->album->title);
 		body[scrobbleI(i, "duration")] = std::to_string(sc->track->tracklen / 1000);
 		prev = sc;
 		sc = sc->next;
 		i++;
 	}
+
 	nlohmann::json res = post("track.scrobble", body);
-	std::cerr << res << std::endl;
-	int ignored = 0;
+	//std::cerr << res << std::endl;
 	if (res.contains("error")) {
-		ignored = len;
+		report.ignored = tracks.size();
 	} else {
-		ignored = res["scrobbles"]["@attr"]["ignored"];
-		std::cout << "accepted: " << res["scrobbles"]["@attr"]["accepted"] << std::endl;
+		report.ignored += res["scrobbles"]["@attr"]["ignored"];
+		report.accepted += res["scrobbles"]["@attr"]["accepted"];
 	}
-	std::cout << "ignored: " << ignored << std::endl;
 	
-	return ignored;
+	return report;
 }
 
 std::string Lastfm::getUsername() {
 	return username;
 }
 
-std::string Lastfm::scrobbleI(int i, std::string key) {
-	std::ostringstream sstrm;
-	sstrm << key << "[" << i << "]";
-	return sstrm.str();
+std::string Lastfm::scrobbleI(int i, std::string key) const {
+	std::string str = key + "[" + std::to_string(i) + "]";
+	return str;
 }
 
 std::string Lastfm::md5(std::string sig) {
@@ -207,7 +211,7 @@ std::string Lastfm::md5(std::string sig) {
 	return ssig.str();
 }
 
-std::string encodeURIComponent(std::string decoded) {
+std::string Lastfm::encodeURIComponent(std::string decoded) {
 	// https://gist.github.com/arthurafarias/56fec2cd49a32f374c02d1df2b6c350f
     std::ostringstream oss;
     std::regex r("[!'\\(\\)*-.0-9A-Za-z_~]");
@@ -226,8 +230,8 @@ std::string encodeURIComponent(std::string decoded) {
     return oss.str();
 }
 
-int lfm(GpodPtr gpod) {
-	std::string inp;
+void Lastfm::scrobbleDb() {
+	//std::string inp;
 
 	//Lastfm lfm(std::getenv("LASTFM_API_KEY"), std::getenv("LASTFM_API_SECRET"));
 
@@ -244,12 +248,11 @@ int lfm(GpodPtr gpod) {
 	itdb = itdb_parse(inp.data(), &err);
 	GERROR(err, true);*/
 
-	std::cout << "tracks: " << gpod->tracks.size() << std::endl;
-	int n = 0;
-	int total = 0;
-	int ign = 0;
+	//std::cout << "tracks: " << gpod->tracks.size() << std::endl;
+	LastfmResponse report;
 	
-	std::vector<GpodTrackPtr> scrobbles;
+	std::vector<const GpodTrackPtr> scrobbles;
+	std::vector<unsigned long> tss;
 	for (const GpodTrackPtr &gtr : gpod.tracks) {
 		GpodTrackPlayData tr = gtr->playData;
 		if (tr->playcount < 1) continue;
@@ -261,34 +264,22 @@ int lfm(GpodPtr gpod) {
 		if (ts <= cData.second) continue;
 		int plays = playcount - cData.first;
 		for (int i = 0; i < plays; i++) {
-			if (n == 48) {
-				ign += lfm.scrobble(scrobbles, 48);
-
-				first = nullptr;
-				prev = nullptr;
-				total += n;
-				n = 0;
+			if (scrobbles.size() == 48) {
+				report += scrobble(scrobbles, tss);
+				tss.clear();
+				scrobbles.clear();
 			}
 			// add 60 seconds between repeated tracks bc itdb doesnt track all timestamps for plays
-			sc->ts = tr.ts + i * 60;
-			if (first == nullptr) {
-				first = sc;
-				prev = sc;
-			} else {
-				prev->next = sc;
-				prev = sc;
-			}
-			n++;
+			tss.push_back(tr.ts + i * 60);
+			scrobbles.push_back(gtr);
 		}
-		//std::cout << tr->title << ": " << tr->playcount << " @ " << tr->time_played << std::endl;
 	}
-	ign += lfm.scrobble(first, n);
+	report += scrobble(scrobbles, tss);
 	
 	//std::cout << "scrobbled " << (total + n) << " songs" << std::endl;
 	//std::cout << "ignored " << ign << " songs" << std::endl;
 
 	cache.write();
-	itdb_free(itdb);
 	cURLpp::terminate();
 	return 0;
 }

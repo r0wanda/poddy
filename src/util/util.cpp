@@ -140,6 +140,10 @@ void ErrorQueue::error(ErrQ err, bool fatal) {
 	if (parent) parent->error(err);
 	else queue.push_back(err);
 }
+void ErrorQueue::warn(ErrQ err) {
+	err.warning = true;
+	error(err);
+}
 void ErrorQueue::setParent(std::shared_ptr<ErrorQueue> errq) {
 	parent = errq;
 	if (!queue.empty()) {
