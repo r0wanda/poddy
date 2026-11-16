@@ -19,7 +19,7 @@ class Gpod;
  */
 class IndepPodMod : public PodUtil::GetPtr<IndepPodMod> {
 public:
-	std::string name;
+	const std::string name;
 	/**
 	 * @brief IndepPodMod constructor
 	 * 
@@ -44,14 +44,8 @@ typedef std::shared_ptr<IndepPodMod> IndepPodModPtr;
 class PodMod : public virtual IndepPodMod {
 public:
 	ftxui::Component content;
-	/**
-	 * @brief PodMod constructor
-	 * 
-	 * @param _name name of the module
-	 * @param pod underlying poddy class
-	 */
-	//PodMod(std::string _name, std::shared_ptr<Poddy> pod);
-	virtual ~PodMod() = default;
+	PodMod();
+	virtual ~PodMod() = 0;
 protected:
 };
 typedef std::shared_ptr<PodMod> PodModPtr;

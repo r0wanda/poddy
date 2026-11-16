@@ -53,7 +53,7 @@ DyPodMod::~DyPodMod() {
 	free();
 }
 
-ModManager::ModManager(std::shared_ptr<Poddy> pod, SettingsIfacePtr siface): PodSettings::PodSettings("mod manager", pod), settings(siface) {
+ModManager::ModManager(std::shared_ptr<Poddy> pod, SettingsIfacePtr siface): IndepPodMod::IndepPodMod("mod manager", pod), settings(siface) {
 	tabs = decltype(tabs)([this](const std::string &a, const std::string &b) -> bool {
 		// sort tabs by preset order
 		return std::find(order.begin(), order.end(), a) < std::find(order.begin(), order.end(), b);

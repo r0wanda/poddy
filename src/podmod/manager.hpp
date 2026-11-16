@@ -33,7 +33,7 @@ public:
 	DyPodMod(std::string path, std::shared_ptr<Tui> tui);
 	PodModPtr get(std::shared_ptr<Poddy> pod);
 	void free();
-	virtual ~DyPodMod();
+	~DyPodMod();
 	PodUtil::ErrorQueuePtr errq;
 private:
 	dypodmod_t init;
@@ -44,19 +44,18 @@ private:
 };
 typedef std::shared_ptr<DyPodMod> DyPodModPtr;
 
+// def. in modmanager.json
+extern const nlohmann::json modmanager;
 typedef std::function<bool(const std::string&, const std::string&)> _PodModComp;
 class ModManager : public PodSettings {
 public:
 	ModManager(std::shared_ptr<Poddy> pod, SettingsIfacePtr siface);
-	void loadModule(PodModPtr mod) {
-		
-	}
 	void loadExternal(std::string path);
 	void addTab(PodModPtr tab);
 	std::map<std::string, PodModPtr, _PodModComp> tabs;
 private:
 	std::vector<std::string> order;
-	bool compTabs(const std::string &a, const std::string &b) const;
 	SettingsIfacePtr settings;
 	std::vector<DyPodModPtr> externs;
 };
+typedef std::shared_ptr<ModManager> ModManagerPtr;

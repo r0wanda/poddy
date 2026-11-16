@@ -14,5 +14,5 @@ target_sources(PodSettings
 
 gen_json(PodSettings manifestSchema manifestSchema.json)
 
-#target_include_directories(PoddySettings PRIVATE ftxui::screen ftxui::dom ftxui::component)
-target_link_libraries(PodSettings PRIVATE PodMod ftxui::screen ftxui::dom ftxui::component nlohmann_json_schema_validator::validator semver::semver)
+target_include_directories(PodSettings PRIVATE nlohmann_json_schema_validator::validator)
+target_link_libraries(PodSettings PRIVATE PodMod ftxui::screen ftxui::dom ftxui::component PUBLIC nlohmann_json_schema_validator::validator semver::semver)

@@ -145,7 +145,7 @@ void FindDev::setupPopup() {
 }
 
 void FindDev::start() {
-	notifLoop = std::jthread(notifWorker, this, tui);
+	notifLoop = std::jthread(notifWorker, this);
 }
 
 void FindDev::stop() {

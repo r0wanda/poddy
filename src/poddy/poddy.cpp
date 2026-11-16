@@ -8,7 +8,7 @@
 
 using namespace ftxui;
 
-PoddyMain::PoddyMain(PoddyPtr pod): PodSettingsMod::PodSettingsMod("iPod", pod) {
+PoddyMain::PoddyMain(PoddyPtr pod): IndepPodMod("iPod", pod) {
 	loadMainMenu();
 	content = Container::Horizontal({
 		Renderer(controls, [this] {
@@ -99,7 +99,7 @@ void PoddyMain::loadMainMenu() {
 
 Poddy::Poddy(std::vector<PodModWrapper> mods): tui(std::make_shared<Tui>(getPtr())), errq(std::make_shared<PodUtil::ErrorQueue>("", tui->errq)) {
 	for (auto &mod : mods) {
-		modules.push_back(mod(getPtr()));
+		modules->addTab(mod(getPtr()));
 	}
 	findd = std::make_shared<FindDev>(tui);
 	findIpod();

@@ -13,5 +13,6 @@ IndepPodMod::IndepPodMod(std::string _name, PoddyPtr pod): name(_name),
 	if (!fs::exists(cachePath)) fs::create_directory(cachePath);
 }
 
-
+PodMod::PodMod() {}
+PodMod::~PodMod() {}
 //PodMod::PodMod(std::string _name, PoddyPtr pod): IndepPodMod::IndepPodMod(_name, pod) {}

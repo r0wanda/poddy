@@ -35,7 +35,7 @@ bool startConfig() {
 		fs::create_directory(cacheDir);
 	}
 
-	configDir = fs::path(config)) / "poddy";
+	configDir = fs::path(config) / "poddy";
 	if (!fs::exists(configDir)) {
 		fs::create_directory(configDir);
 	}
@@ -124,7 +124,7 @@ ErrQ::ErrQ(GError *&err, bool isFatal): msg(std::to_string(err->code) + err->mes
 	g_error_free(err);
 	err = nullptr;
 }
-ErrQ::ErrQ(const ErrQ &err): msg(err.msg), errq(err.errq), fatal(err.fatal) {}
+ErrQ::ErrQ(const ErrQ &err): errq(err.errq), msg(err.msg), fatal(err.fatal) {}
 
 ErrorQueue::ErrorQueue(std::string nm): name(nm) {}
 ErrorQueue::ErrorQueue(std::string nm, ErrorQueuePtr padre): name(nm), parent(padre) {}
@@ -149,6 +149,3 @@ void ErrorQueue::setParent(std::shared_ptr<ErrorQueue> errq) {
 	}
 }
 
-// https://stackoverflow.com/a/3809435 CC BY-SA 4.0
-const std::regex Regex::url{"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"};
-const std::regex Regex::httpUrl{"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"};

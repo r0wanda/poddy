@@ -51,7 +51,8 @@ namespace PodUtil {
 	typedef std::shared_ptr<ErrorQueue> ErrorQueuePtr;
 
 	namespace Regex {
-		const std::regex url;
-		const std::regex httpUrl;
+		// https://stackoverflow.com/a/3809435 CC BY-SA 4.0
+		const std::regex url{"[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"};
+		const std::regex httpUrl{"https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"};
 	};
 };

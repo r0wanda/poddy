@@ -9,40 +9,6 @@
 #include <semver.hpp>
 #include <ftxui/component/component.hpp>
 
-// abstract class that handles settings
-/*template <typename T>
-class Tracker {
-public:
-	PodSettingsBase(const T& val) : value(val), written(false) {};
-	const T& get() const {
-		return value;
-	}
-	operator const T&() const {
-		return value;
-	}
-	void set(const T& val) {
-		if (value != val) {
-
-			value = val;
-			changed = true;
-		}
-	}
-	const T* operator->() const noexcept {
-		return &value;
-	}
-	T* operator->() noexcept {
-		changed = true;
-		return &value;
-	}
-
-	void write() {
-		changed = false;
-	}
-private:
-	T value;
-	bool changed = false;
-};*/
-
 /**
  * @brief PodSettings WITHOUT window
  * 
@@ -50,23 +16,16 @@ private:
 class PodSettings : public virtual IndepPodMod {
 public:
 	ftxui::Component edit;
-	PodSettings(std::string _name, std::shared_ptr<Poddy> pod);
-	virtual ~PodSettings() = default;
+	PodSettings();
+	virtual ~PodSettings() = 0;
 protected:
 	std::filesystem::path settingsPath;
+	nlohmann::json_schema::json_validator schema;
+	void validate();
+	void initDefault();
 	nlohmann::json config;
-	void writeConfig() {
-		std::ofstream strm(settingsPath);
-		strm << config;
-		strm.close();
-	}
-	void loadConfig() {
-		std::ifstream strm(settingsPath);
-		nlohmann::json j;
-		strm >> j;
-		strm.close();
-		config = j;
-	}
+	void writeConfig();
+	void loadConfig();
 };
 typedef std::shared_ptr<PodSettings> PodSettingsPtr;
 
@@ -75,12 +34,18 @@ typedef std::shared_ptr<PodSettings> PodSettingsPtr;
  * 
  */
 class PodSettingsMod : public PodSettings, public PodMod {
-public:
-	PodSettingsMod(std::string _name, std::shared_ptr<Poddy> pod);
+protected:
+	PodSettingsMod();
+	virtual ~PodSettingsMod() = 0;
 };
 typedef std::shared_ptr<PodSettingsMod> PodSettingsModPtr;
 
+// def. in manifestSchema.json
 extern const nlohmann::json manifestSchema;
+/**
+ * @brief struct representing module manifest
+ * 
+ */
 struct PodManifestT {
 	static const nlohmann::json_schema::json_validator schema;
 	PodManifestT(const nlohmann::json &manif);
@@ -95,7 +60,8 @@ struct PodManifestT {
 class PodManifestMod : public PodSettingsMod {
 public:
 	const PodManifestT manifest;
-	PodManifestMod(std::string _name, std::shared_ptr<Poddy> pod, const nlohmann::json &manif);
+	PodManifestMod(const nlohmann::json &manif);
+	virtual ~PodManifestMod() = 0;
 };
 typedef std::shared_ptr<PodManifestMod> PodManifestModPtr;
 
