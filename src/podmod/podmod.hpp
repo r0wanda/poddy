@@ -49,6 +49,6 @@ public:
 protected:
 };
 typedef std::shared_ptr<PodMod> PodModPtr;
-typedef std::function<PodModPtr(std::shared_ptr<Poddy>)>& PodModWrapper;
-typedef std::function<IndepPodModPtr(std::shared_ptr<Poddy>)>& IndepPodModWrapper;
+typedef std::function<PodModPtr(std::shared_ptr<Poddy>)> PodModWrapper;
+//typedef std::function<IndepPodModPtr(std::shared_ptr<Poddy>)>& IndepPodModWrapper;
 #define WRAPPODMOD(base) [](std::shared_ptr<Poddy> pod) -> PodModPtr { return std::make_shared<base>(pod)->getPtr(); }

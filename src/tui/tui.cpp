@@ -15,11 +15,11 @@ void TuiErrorQueue::error(PodUtil::ErrQ err) {
 	tui->dispError(err);
 }
 
-Tui::Tui(std::shared_ptr<Poddy> pod): app(nullptr), tabsC(), errq(std::make_shared<TuiErrorQueue>(getPtr())), poddy(pod), modules(poddy->modules), curTab(0) {
-	/*std::vector<std::string> names;
-	for (const PodMod &pm : modules) {
-		tabsC.push_back(pm.content);
-		names.push_back(pm.name);
+Tui::Tui(std::shared_ptr<Poddy> pod): app(nullptr), tabsC(), errq(std::make_shared<TuiErrorQueue>(getPtr())), poddy(pod), curTab(0) {
+	std::vector<std::string> names;
+	for (auto const &[name, mod] : poddy->modules->tabs) {
+		tabsC.push_back(mod->content);
+		names.push_back(name);
 	}
 	tabmenu = Container::Tab(tabsC, &curTab);
 	toggle = Toggle(names, &curTab);
@@ -34,7 +34,7 @@ Tui::Tui(std::shared_ptr<Poddy> pod): app(nullptr), tabsC(), errq(std::make_shar
 			separator(),
 			container->Render()
 		});
-	});*/
+	});
 	app = new App(App::FullscreenAlternateScreen());
   	//app->Loop(renderer);
 }

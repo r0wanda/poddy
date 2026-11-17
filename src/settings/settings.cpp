@@ -1,11 +1,26 @@
 #include "settings.hpp"
+#include <stdexcept>
 
 namespace fs = std::filesystem;
+using namespace nlohmann::literals;
 
 PodSettings::PodSettings() {
 	settingsPath = configPath / name / ".json";
 	if (!fs::exists(settingsPath)) {}
 }
+
+void PodSettings::validate() {
+	loadConfig();
+	try {
+		schema.validate(config);
+	} catch (const std::exception &err) {
+		
+	}
+}
+void PodSettings::initDefault() {
+
+}
+
 void PodSettings::writeConfig() {
 	std::ofstream strm(settingsPath);
 	strm << config;
@@ -13,10 +28,9 @@ void PodSettings::writeConfig() {
 }
 void PodSettings::loadConfig() {
 	std::ifstream strm(settingsPath);
-	nlohmann::json j;
-	strm >> j;
+	config = "{}"_json;
+	strm >> config;
 	strm.close();
-	config = j;
 }
 PodSettings::~PodSettings() {}
 

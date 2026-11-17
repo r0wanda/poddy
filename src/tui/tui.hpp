@@ -32,7 +32,6 @@ public:
 	ftxui::Component renderer;
 	ftxui::Component container;
 	ftxui::Components tabsC;
-	std::vector<std::shared_ptr<PodMod>> modules;
 	std::vector<ProgressBarPtr> prog;
 	Tui(std::shared_ptr<Poddy> pod);
 	void popup(ftxui::Component pop);
