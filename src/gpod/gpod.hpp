@@ -21,6 +21,10 @@ class GpodTrack;
 class Gpod;
 class GpodSortContainer;
 
+struct GpodSettings {
+	bool eject;
+};
+
 struct GpodSortItem {
 	std::string sortName;
 	bool ascend = true;
@@ -224,6 +228,7 @@ public:
 	void addArtist(std::shared_ptr<GpodArtist> ar);
 	void addAlbum(std::shared_ptr<GpodAlbum> al);
 	void process(std::function<void(int)> perCb);
+	void eject();
 
 	PodUtil::ErrorQueuePtr errq;
 	~Gpod();
@@ -235,7 +240,7 @@ public:
 	friend class GpodSortContainer;
 protected:
 	Itdb_iTunesDB *itdb = nullptr;
-	std::string path;
+	const std::string path;
 };
 
 typedef std::shared_ptr<Gpod> GpodPtr;
