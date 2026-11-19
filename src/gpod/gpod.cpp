@@ -8,6 +8,7 @@
 #include <iostream>
 #include <taglib/tag.h>
 #include <taglib/fileref.h>
+#include "eject.hpp"
 
 bool GpodSortItem::compare(const GpodSortItem &it) {
 	int comp = sortName.compare(it.sortName);
@@ -310,9 +311,13 @@ void Gpod::process(std::function<void(int)> perCb) {
 	}
 	albums->finalize();
 }
+void Gpod::eject() {
+	eject(path);
+	itdb_free(itdb);
+	itdb = nullptr;
+}
 
 Gpod::~Gpod() {
-	itdb_free(itdb);
 }
 
 void GpodArtwork::write(GpodTrackPtr tr) {

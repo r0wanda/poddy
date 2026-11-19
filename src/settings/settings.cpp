@@ -29,7 +29,7 @@ void PodSettings::writeConfig() {
 }
 void PodSettings::loadConfig() {
 	std::ifstream strm(settingsPath);
-	config = "{}"_json;
+	config = nlohamnn::json::parse("{}");
 	strm >> config;
 	strm.close();
 }

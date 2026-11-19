@@ -2,12 +2,16 @@
 #include <string>
 #include <memory>
 #include <fstream>
+#include <concepts>
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <podmod.hpp>
 #include <semver.hpp>
 #include <ftxui/component/component.hpp>
+
+template <struct T>
+concept JsonStruct = std::is_constructable_v<T, const nlohmann::json>
 
 /**
  * @brief PodSettings WITHOUT window

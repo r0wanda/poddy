@@ -5,6 +5,8 @@ add_library(GpodXX)
 target_sources(GpodXX
 	PRIVATE
 		gpod.cpp
+		eject.cpp
+		eject.hpp
 	PUBLIC
 		FILE_SET gpodheaders
 		TYPE HEADERS
@@ -14,6 +16,8 @@ target_sources(GpodXX
 
 #target_include_directories(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
 #target_link_libraries(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
+
+gen_json(GpodXX gpodSchema schema.json)
 
 find_package(TagLib REQUIRED)
 target_link_libraries(GpodXX PRIVATE TagLib::TagLib)

@@ -24,7 +24,6 @@ target_sources(poddy
 )
 
 include(tools/json2hpp.cmake)
-add_subdirectory(external/miniz)
 add_subdirectory(external/ftxui)
 add_subdirectory(external/curlpp)
 add_subdirectory(external/nlohmann)

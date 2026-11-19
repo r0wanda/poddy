@@ -1,10 +1,13 @@
+#include "eject.hpp"
 #include <string>
+
+#ifdef IS_LINUX
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <filesystem>
 #include <mntent.h>
-#include "fs.hpp"
 
 void eject(std::string path) {
 	fs::path inp(path);
@@ -27,12 +30,13 @@ void eject(std::string path) {
 	std::system(cmd1.c_str());
 	std::system(cmd2.c_str());
 }
+#endif
 
-int main(int argc, char **argv) {
+/*int main(int argc, char **argv) {
 	if (argc < 2) {
 		std::cerr << "usage: " << argv[0] << " <mountpoint>" << std::endl;
 		return 1;
 	}
 	eject(argv[1]);
 	return 0;
-}
+}*/
