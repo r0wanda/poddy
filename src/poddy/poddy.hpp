@@ -27,6 +27,7 @@ private:
 
 	ftxui::Component mainMenu;
 	ftxui::MenuEntryOption menuEntryOpt(GpodBasePtr menuItems);
+	void updateInfo();
 	GpodBasePtr currentItem;
 
 	ftxui::Component info;

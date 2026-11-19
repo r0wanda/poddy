@@ -31,6 +31,9 @@ struct GpodSortItem {
 	int trackN = -1;
 	bool compare(const GpodSortItem &it);
 };
+struct GpodBaseInfo {
+	
+};
 /**
  * @brief Gpod* sorting methods
  * { display name, { string to sort, ascending? } }

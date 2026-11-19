@@ -38,6 +38,10 @@ MenuEntryOption PoddyMain::menuEntryOpt(GpodBasePtr item) {
 	return option;
 }
 
+void updateInfo() {
+	
+}
+
 void PoddyMain::loadMainMenu() {
 	// selectors
 	static int menuToggleSel = 0;
