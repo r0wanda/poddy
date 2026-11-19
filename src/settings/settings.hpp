@@ -40,8 +40,6 @@ protected:
 };
 typedef std::shared_ptr<PodSettingsMod> PodSettingsModPtr;
 
-// def. in manifestSchema.json
-extern const nlohmann::json manifestSchema;
 /**
  * @brief struct representing module manifest
  * 

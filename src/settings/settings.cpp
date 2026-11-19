@@ -1,5 +1,6 @@
 #include "settings.hpp"
 #include <stdexcept>
+#include "manifestSchema.hpp"
 
 namespace fs = std::filesystem;
 using namespace nlohmann::literals;

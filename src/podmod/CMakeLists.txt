@@ -5,13 +5,15 @@ add_library(PodMod)
 target_sources(PodMod
 	PRIVATE
  		podmod.cpp
+		manager.cpp
 	PUBLIC
 		FILE_SET podmodheaders
 		TYPE HEADERS
 		FILES
 			podmod.hpp
+			manager.hpp
 )
-gen_json(PodMod modmanager modmanager.json)
+gen_json(PodMod modmanagerSchema)
 
 #target_include_directories(PodMod PRIVATE ftxui::screen ftxui::dom ftxui::component)
 target_link_libraries(PodMod PUBLIC PodUtil GpodXX PoddyTui PoddyMain PRIVATE ftxui::screen ftxui::dom ftxui::component miniz)

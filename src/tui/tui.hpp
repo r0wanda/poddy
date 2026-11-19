@@ -42,6 +42,7 @@ private:
 	ProgressBarPtr totalProg;
 	std::shared_ptr<Poddy> poddy;
 	int curTab;
+	std::vector<std::string> tabNames;
 	ftxui::Component tabmenu;
 	ftxui::Component toggle;
 };

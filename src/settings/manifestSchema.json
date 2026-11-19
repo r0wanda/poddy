@@ -10,6 +10,10 @@
 			"description": "version of the manifest (semver)",
 			"type": "string"
 		},
+		"minVersion": {
+			"description": "minimum poddy version",
+			"type": "string"
+		},
 		"zip": {
 			"description": "url of the module the manifest is describing",
 			"type": "string"

@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 	if (!PodUtil::startConfig()) {
 		return 1;
 	}
-	std::vector<PodModPtr> modules = { std::make_shared<PoddyMain>() };
+	std::vector<PodModWrapper> modules = { WRAPPODMOD(PoddyMain) };
 	Poddy poddy(modules);
 	return 0;
 }

@@ -19,7 +19,8 @@
                 "${workspaceFolder}/build/src",
                 "${workspaceFolder}/src/**",
                 "${workspaceFolder}/external/json-schema-validator/src",
-                "${workspaceFolder}/external/semver/include"
+                "${workspaceFolder}/external/semver/include",
+                "${workspaceFolder}/build/src/*"
             ],
             "defines": [
                 "IS_LINUX"

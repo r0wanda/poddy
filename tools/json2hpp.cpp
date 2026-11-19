@@ -10,7 +10,8 @@ int main(int argc, char **argv) {
 		std::cerr << "not enough args\nusage: json2hpp <name> <file>" << std::endl;
 		return 1;
 	}
-	std::ifstream file(argv[2]);
+	std::string srcF(argv[2]);
+	std::ifstream file(srcF + ".json");
 	std::string name(argv[1]);
 	nlohmann::json j;
 	file >> j;
@@ -24,8 +25,10 @@ int main(int argc, char **argv) {
 	}
 	std::string out = ss.str() + "0x00";
 
-	std::ofstream outf(std::string(argv[1]) + ".cpp");
-	outf << "#include <nlohmann/json.hpp>\nconst unsigned char _" << name << "[] = {" << out << "};\nconst nlohmann::json " << name << " = nlohmann::json::parse(_" << name << ", _" << name << " + " << out.size() << ");\n";
+	std::ofstream outf(name + ".cpp");
+	outf << "#include \"" << srcF << ".hpp\"\n"
+		 << "const unsigned char _" << name << "[" << dump.size() + 1 << "] = {" << out << "};\n"
+		 << "const nlohmann::json " << name << " = nlohmann::json::parse(_" << name << ", _" << name << " + " << dump.size() << ");\n";
 	outf.close();
 	return 0;
 }

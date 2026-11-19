@@ -79,6 +79,7 @@ GpodTrack::GpodTrack(Itdb_Track *tr, GpodPtr gp): GpodBase::GpodBase(GpodBase::T
 	sort.insert({"Most Played", { std::to_string(tr->playcount), false }});
 	sort.insert({"Recently Played", { std::to_string(tr->time_played), false }});
 }
+/*
 GpodTrack::GpodTrack(TagLib::FileRef ref, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Track, gp) {
 	TagLib::Tag *tag = ref.tag();
 	Itdb_Track *tr = itdb_track_new();
@@ -87,7 +88,7 @@ GpodTrack::GpodTrack(TagLib::FileRef ref, GpodPtr gp): GpodBase::GpodBase(GpodBa
 		errq->error("file has no tags");
 		return;
 	}
-}
+}*/
 void GpodTrack::setArtist(GpodArtistPtr ar) {
 	artist = ar;
 	sort["Artist"].sortName = album->sortName;
@@ -101,7 +102,7 @@ std::string GpodTrack::display() const {
 	return artist->name + " - " + name;
 }
 
-GpodAlbum::GpodAlbum(std::string n, std::string sortNm, int year, GpodArtistPtr arst, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Album, n, sortNm, gp), artist(arst) {
+GpodAlbum::GpodAlbum(const std::string &n, const std::string &sortNm, int year, GpodArtistPtr arst, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Album, n, sortNm, gp), artist(arst) {
 	artist->addAlbum(getPtr<GpodAlbum>());
 	sort.insert({"Artist", { artist->sortName, true }});
 	sort.insert({"Release Date", { std::to_string(year), false }});
@@ -125,7 +126,7 @@ std::string GpodAlbum::display() const {
 	return artist->name + " - " + name;
 }
 
-GpodArtist::GpodArtist(std::string n, std::string sortNm, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Artist, n, sortNm, gp),
+GpodArtist::GpodArtist(const std::string &n, const std::string &sortNm, GpodPtr gp): GpodBase::GpodBase(GpodBase::Type::Artist, n, sortNm, gp),
 tracks(std::make_shared<GpodSortContainer>(gp)), albums(std::make_shared<GpodSortContainer>(gp)) {
 	sort.insert({"Most Played", { "0", false }});
 	sort.insert({"Recently Played", { "0", false }});
@@ -171,63 +172,78 @@ GpodSortContainer::GpodSortContainer(GpodPtr gp): finalized(false), gpod(gp),
 	errq(std::make_shared<PodUtil::ErrorQueue>("sort menu", gpod->errq)) {}
 GpodSortContainer::GpodSortContainer(std::vector<GpodBasePtr> vec, GpodPtr gp): items(vec), finalized(true), gpod(gp),
 	errq(std::make_shared<PodUtil::ErrorQueue>("sort menu", gpod->errq)) {
-	for (const auto &p : items.at(0)->sort) {
-		sorts.insert({p.first, {}});
-	}
+	if (items.empty()) return;
+	initSorts();
+}
+void GpodSortContainer::initSorts() {
+	if (items.empty()) return;
+	const GpodSortMap &sortM = items.at(0)->sort;
+	std::transform(sortM.cbegin(), sortM.cend(), std::inserter(sorts, sorts.end()), [](const auto &sortMI) {
+		return std::pair<std::string, std::vector<GpodBasePtr>>{sortMI.first, {}};
+	});
 }
 
-std::vector<GpodBasePtr> GpodSortContainer::get(std::string key) {
-	if (!sorts.contains(key)) {
+std::vector<GpodBasePtr> GpodSortContainer::get(const std::string &key) {
+	// if no items
+	if (items.empty()) {
+		return std::vector<GpodBasePtr>();
+	}
+	std::vector<GpodBasePtr> curSort;
+	try {
+		curSort = sorts.at(key);
+	} catch (std::out_of_range&) {
 		errq->error("invalid sort type");
 		return std::vector<GpodBasePtr>();
+	}
+
+	// sort if unsorted
+	if (curSort.empty()) {
+		sort(key);
+		curSort = sorts.at(key);
 	}
 	
 	if (key == currentName) {
 		ascending = !ascending;
 	} else {
 		currentName = key;
+		ascending = curSort.at(0)->sort.at(key).ascend;
 	}
-
-	// sort if unsorted
-	if (sorts.at(key).empty()) sort(key);
 
 	if (ascending) {
 		return sorts.at(key);
 	} else {
-		return std::vector<GpodBasePtr>(sorts.at(key).rbegin(), sorts.at(key).rend());
+		return std::vector<GpodBasePtr>(curSort.rbegin(), curSort.rend());
 	}
 }
 
 void GpodSortContainer::sort(std::string key) {
-	sorts[key] = items;
-	std::sort(sorts.at(key).begin(), sorts.at(key).end(), [&key](const GpodBasePtr &a, const GpodBasePtr &b) -> bool {
+	sorts.insert({key, items});
+	std::vector<GpodBasePtr> &curSort = sorts.at(key);
+	std::sort(curSort.begin(), curSort.end(), [&key](const GpodBasePtr &a, const GpodBasePtr &b) -> bool {
 		return a->sort.at(key).compare(b->sort.at(key));
 	});
-
-	currentName = key;
-	ascending = sorts.at(key).at(0)->sort.at(key).ascend;
 }
 void GpodSortContainer::addItem(GpodBasePtr base) {
 	items.push_back(base);
 	if (!finalized) return;
-	for (const auto &p : sorts) {
-		const std::string &key = p.first;
-		auto iter = std::upper_bound(sorts.at(key).begin(), sorts.at(key).end(), base, [&key](const GpodBasePtr &a, const GpodBasePtr &b) -> bool {
-			return a->sort.at(key).compare(b->sort.at(key));
+	for (auto &p : sorts) {
+		std::vector<GpodBasePtr> &curSort = p.second;
+		auto iter = std::upper_bound(curSort.begin(), curSort.end(), base, [&p](const GpodBasePtr &a, const GpodBasePtr &b) -> bool {
+			return a->sort.at(p.first).compare(b->sort.at(p.first));
 		});
-		sorts.at(key).insert(iter, base);
+		curSort.insert(iter, base);
 	}
 }
 void GpodSortContainer::finalize() {
 	finalized = true;
 }
 std::vector<std::string> GpodSortContainer::sortKeys() const {
-	auto keys = std::views::keys(sorts);
+	const auto &keys = std::views::keys(sorts);
 	return std::vector<std::string>(keys.begin(), keys.end());
 }
 
 // gpod main class
-Gpod::Gpod(std::string dbPath):
+Gpod::Gpod(const std::string &dbPath):
 tracks(std::make_shared<GpodSortContainer>(getPtr())), artists(std::make_shared<GpodSortContainer>(getPtr())), albums(std::make_shared<GpodSortContainer>(getPtr())),
 path(dbPath) {
 	GError *err = nullptr;
@@ -254,13 +270,11 @@ void Gpod::process(std::function<void(int)> perCb) {
 	//size_t trLen = g_list_length(itdb->tracks);
 	GList *it;
 	for (it = itdb->tracks; it != NULL; it = it->next) {
-		Itdb_Track *tr = (Itdb_Track*)it->data;
+		Itdb_Track *tr = static_cast<Itdb_Track*>(it->data);
 		GpodTrackPtr gt = std::make_shared<GpodTrack>(tr, getPtr());
 		int year = gt->trackData.year;
 		std::string arName(tr->artist);
 		std::string alName(tr->album);
-		std::string arSortName(tr->sort_artist);
-		std::string alSortName(tr->sort_album);
 
 		// add to tracks
 		addTrack(gt);
@@ -268,7 +282,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 		// find or create artist
 		GpodArtistPtr artist;
 		if (artistMap.find(arName) == artistMap.end()) {
-			artist = std::make_shared<GpodArtist>(arName, arSortName, getPtr());
+			artist = std::make_shared<GpodArtist>(arName, tr->sort_artist, getPtr());
 			addArtist(artist);
 		} else {
 			artist = artistMap.at(arName);
@@ -282,7 +296,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 		if (alOpt.has_value()) {
 			album = alOpt.value();
 		} else {
-			album = std::make_shared<GpodAlbum>(alName, alSortName, year, artist->getPtr<GpodArtist>(), getPtr());
+			album = std::make_shared<GpodAlbum>(alName, tr->sort_album, year, artist->getPtr<GpodArtist>(), getPtr());
 			addAlbum(album);
 		}
 		album->addTrack(gt);

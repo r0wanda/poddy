@@ -27,7 +27,6 @@ public:
 	std::string name;
 	// 0 = prob 1 = maybe 2 = nah
 	char isIpod = 2;
-	bool _discard;
 #ifdef IS_LINUX
 	UDisksFilesystem *dev;
 	DiskDev(UDisksBlock *b, UDisksFilesystem *fs, FindDev *fd);
@@ -43,7 +42,7 @@ class FindDev {
 public:
 	DiskDev *connected = nullptr;
 	std::vector<DiskDevPtr> devs;
-	FindDev(TuiPtr _tui);
+	explicit FindDev(TuiPtr _tui);
 	void start();
 	void stop();
 	void refresh();

@@ -72,8 +72,9 @@ public:
 	GpodSortContainer(std::shared_ptr<Gpod> gp);
 	GpodSortContainer(std::vector<std::shared_ptr<GpodBase>> vec, std::shared_ptr<Gpod> gp);
 	
-	std::vector<std::shared_ptr<GpodBase>> get(std::string key);
+	std::vector<std::shared_ptr<GpodBase>> get(const std::string &key);
 	void sort(std::string key);
+	void initSorts();
 	void addItem(std::shared_ptr<GpodBase> base);
 	void finalize();
 	std::vector<std::string> sortKeys() const;
@@ -134,7 +135,6 @@ struct GpodTrackData {
 	std::string sort_tvshow;
 };*/
 struct GpodTrackPlayData {
-	GpodTrackPlayData() = default;
 	GpodTrackPlayData(Itdb_Track *tr);
 	unsigned short playcount;
 	unsigned short recentPlaycount;
@@ -167,7 +167,7 @@ public:
 	// maybe in future add sorting in album view? cant think of a reason tho
 	std::vector<std::shared_ptr<GpodTrack>> tracks;
 
-	GpodAlbum(std::string n, std::string sortNm, int year, std::shared_ptr<GpodArtist> arst, std::shared_ptr<Gpod> gp);
+	GpodAlbum(const std::string &n, const std::string &sortNm, int year, std::shared_ptr<GpodArtist> arst, std::shared_ptr<Gpod> gp);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 
@@ -185,7 +185,7 @@ public:
 	GpodSortContainerPtr tracks;
 	GpodSortContainerPtr albums;
 
-	GpodArtist(std::string n, std::string sortNm, std::shared_ptr<Gpod> gp);
+	GpodArtist(const std::string &n, const std::string &sortNm, std::shared_ptr<Gpod> gp);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 	void addAlbum(std::shared_ptr<GpodAlbum> al, bool addTracks = false);
@@ -218,7 +218,7 @@ public:
 	GpodSortContainerPtr playlists;
 	std::map<std::string, std::shared_ptr<GpodArtist>> artistMap;
 
-	Gpod(std::string dbPath);
+	Gpod(const std::string &dbPath);
 
 	void addTrack(std::shared_ptr<GpodTrack> tr);
 	void addArtist(std::shared_ptr<GpodArtist> ar);

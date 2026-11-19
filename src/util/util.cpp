@@ -1,8 +1,6 @@
 #include "util.hpp"
 #include <iostream>
 
-using namespace PodUtil;
-
 namespace fs = std::filesystem;
 
 /**
@@ -12,7 +10,7 @@ namespace fs = std::filesystem;
 #ifdef IS_LINUX
 #include <cstdlib>
 
-bool startConfig() {
+bool PodUtil::startConfig() {
 	static bool confReady = false;
 	if (confReady) return true;
 
@@ -49,7 +47,7 @@ bool startConfig() {
 #include <shlobj.h>
 
 // https://stackoverflow.com/a/62314965
-bool startConfig() {
+bool PodUtil::startConfig() {
 	static bool confReady = false;
 	if (confReady) return true;
 
@@ -86,7 +84,7 @@ bool startConfig() {
 #elifdef IS_MACOS
 #include <cstdlib>
 
-bool startConfig() {
+bool PodUtil::startConfig() {
 	static bool confReady = false;
 	if (confReady) return true;
 
@@ -111,6 +109,7 @@ bool startConfig() {
 }
 #endif
 
+using namespace PodUtil;
 
 ErrQ::ErrQ(const char *str): msg(str), fatal(false) {}
 ErrQ::ErrQ(std::string str): msg(str), fatal(false) {}

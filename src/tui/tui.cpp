@@ -16,13 +16,13 @@ void TuiErrorQueue::error(PodUtil::ErrQ err) {
 }
 
 Tui::Tui(std::shared_ptr<Poddy> pod): app(nullptr), tabsC(), errq(std::make_shared<TuiErrorQueue>(getPtr())), poddy(pod), curTab(0) {
-	std::vector<std::string> names;
+	tabNames.clear();
 	for (auto const &[name, mod] : poddy->modules->tabs) {
 		tabsC.push_back(mod->content);
-		names.push_back(name);
+		tabNames.push_back(name);
 	}
 	tabmenu = Container::Tab(tabsC, &curTab);
-	toggle = Toggle(names, &curTab);
+	toggle = Toggle(tabNames, &curTab);
 	
 	container = Container::Vertical({
 		toggle,
@@ -64,5 +64,9 @@ void Tui::dispError(PodUtil::ErrQ err) {
 }
 
 PodModPtr Tui::getCurTab() {
-	return modules.at(curTab);
+	try {
+		return poddy->modules->tabs.at(tabNames.at(curTab));
+	} catch (...) {
+		return PodModPtr();
+	}
 }

@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
 #include <ftxui/screen/color.hpp>
 #include <util.hpp>
 
@@ -19,21 +20,20 @@ bool searchIpod(std::string str) {
 }
 
 #ifdef IS_LINUX
-DiskDev::DiskDev(UDisksBlock *b, UDisksFilesystem *fs, FindDev *fd): dev(fs), findd(fd) {
-	uuid = udisks_block_get_id_uuid(b);
-	path = udisks_block_get_device(b);
+DiskDev::DiskDev(UDisksBlock *b, UDisksFilesystem *fs, FindDev *fd):
+	uuid(udisks_block_get_id_uuid(b)), path(udisks_block_get_device(b)),
+	dev(fs), findd(fd) {
 	std::string _name = udisks_block_get_id_label(b);
-	name = _name;
 	std::string id = udisks_block_get_drive(b);
 	g_object_unref(b);
-	if (name.empty()) {
+	if (_name.empty()) {
 		if (id.empty()) {
-			name = "unnamed disk";
+			_name = "unnamed disk";
 			isIpod = 2;
-			return;
-		} else name = id;
+		} else _name = id;
 	} else if (searchIpod(id) || searchIpod(_name)) isIpod = 0;
 	else isIpod = 1;
+	name = _name;
 }
 #endif
 
@@ -110,9 +110,9 @@ void FindDev::setupPopup() {
 	static const std::vector<std::string> icons{"✓", "?", "✕"};
 	using namespace ftxui;
 	Components ents;
-	for (DiskDevPtr &dd : devs) {
+	for (const DiskDevPtr &dd : devs) {
 		MenuEntryOption opt;
-		opt.transform = [dd](EntryState st) {
+		opt.transform = [&dd](EntryState st) {
 			st.label = (st.active ? "> " : "  ") + st.label;
 			Element e = text(st.label);
 			switch (dd->isIpod) {
@@ -154,7 +154,7 @@ void FindDev::stop() {
 
 void FindDev::refresh() {
 #ifdef IS_LINUX
-	std::map<std::string, DiskDevPtr> ndevs;
+	std::unordered_set<std::string> uuids;
 	GList *objects = g_dbus_object_manager_get_objects(manager);
 
     for (GList *l = objects; l != nullptr; l = l->next) {
@@ -168,21 +168,19 @@ void FindDev::refresh() {
 		}
 
 		std::string uuid(udisks_block_get_id_uuid(block));
+		uuids.insert(uuid);
+		// check if dev is already in list
 		if (std::find_if(devs.begin(), devs.end(), [&uuid](DiskDevPtr const &d) -> bool {
 			return d->uuid == uuid;
 		}) != devs.end()) continue;
+
+		// create new dev if not yet added
 		DiskDevPtr ddev = std::make_shared<DiskDev>(block, fs, this);
-		ndevs.insert({uuid, ddev});
+		devs.push_back(ddev);
     }
-	for (auto it = devs.begin(); it != devs.end(); it++) {
-		if (ndevs.contains((*it)->uuid)) {
-			it->reset();
-			devs.erase(it);
-		}
-	}
-	for (auto &dd : ndevs) {
-		devs.push_back(dd.second);
-	}
+	std::erase_if(devs, [&uuids](const DiskDevPtr &dd) {
+		return !uuids.contains(dd->uuid);
+	});
     g_list_free_full(objects, g_object_unref);
 #endif
 	std::sort(devs.begin(), devs.end(), [](DiskDevPtr const &a, DiskDevPtr const &b) {
