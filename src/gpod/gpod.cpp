@@ -312,7 +312,7 @@ void Gpod::process(std::function<void(int)> perCb) {
 	albums->finalize();
 }
 void Gpod::eject() {
-	eject(path);
+	::eject(path);
 	itdb_free(itdb);
 	itdb = nullptr;
 }

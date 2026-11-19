@@ -17,7 +17,7 @@ target_sources(GpodXX
 #target_include_directories(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
 #target_link_libraries(GpodXX PRIVATE ftxui::screen ftxui::dom ftxui::component)
 
-gen_json(GpodXX gpodSchema schema.json)
+gen_json(GpodXX gpodSchema)
 
 find_package(TagLib REQUIRED)
 target_link_libraries(GpodXX PRIVATE TagLib::TagLib)
