@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json-schema.hpp>
 #include "cache.hpp"
 #include <gpod.hpp>
 #include <settings.hpp>
@@ -12,6 +13,21 @@ struct LastfmResponse {
 	LastfmResponse operator+(const LastfmResponse &res) {
 		return LastfmResponse{ignored + res.ignored, accepted + res.accepted};
 	}
+};
+
+struct LastfmIgnList {
+	LastfmIgnList(const nlohmann::json &list);
+	std::vector<std::regex> rex;
+	std::vector<std::string> str;
+};
+struct LastfmIgnore {
+	static const nlohmann::json_schema::json_validator schema;
+	LastfmIgnore(const nlohmann::json &sch);
+	nlohmann::json write();
+	LastfmIgnList artists;
+	LastfmIgnList albums;
+	LastfmIgnList tracks;
+	LastfmIgnList playlists;
 };
 
 class Lastfm : public PodSettingsMod {

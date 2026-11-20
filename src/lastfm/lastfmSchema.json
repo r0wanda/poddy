@@ -1,0 +1,57 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"title": "lastpod ignore",
+	"definitions": {
+		"item": {
+			"type": "object",
+			"properties": {
+				"regex": {
+					"description": "use regex",
+					"type": "string",
+					"default": "true"
+				},
+				"value": {
+					"description": "value to ignore",
+					"type": "string"
+				}
+			}
+		}
+	},
+	"properties": {
+		"ignore": {
+            "description": "ignore certain albums",
+            "type": "object",
+            "properties": {
+				"albums": {
+					"description": "albums to ignore",
+					"type": ["array", "string"],
+					"items": {
+						"$ref": "#/definitions/item"
+					}
+				},
+				"artists": {
+					"description": "artists to ignore",
+					"type": ["array", "string"],
+					"items": {
+						"$ref": "#/definitions/item"
+					}
+				},
+				"tracks": {
+					"description": "tracks to ignore",
+					"type": ["array", "string"],
+					"items": {
+						"$ref": "#/definitions/item"
+					}
+				},
+				"playlists": {
+					"description": "playlists to ignore",
+					"type": ["array", "string"],
+					"items": {
+						"$ref": "#/definitions/item"
+					}
+				}
+			}
+        }
+	},
+	"required": []
+}

@@ -7,15 +7,13 @@
 
 namespace fs = std::filesystem;
 
-Cache::Cache(): initdbts(0) {
-	path = fs::path(home) / ".lastpod";
-	ignPath = fs::path(home) / ".lastpodignore";
+Cache::Cache(const std::filesystem::path &path, const std::filesystem::path &ign): initdbts(0), path(path), ignPath(ign) {
 	read();
 }
 
 void Cache::read() {
-	initdb = ITdb();
-	db = ITdb();
+	initdb = {};
+	db = {};
 	std::ifstream strm(path);
 	if (!strm.is_open()) return;
 	std::string idbts;
@@ -38,10 +36,10 @@ void Cache::read() {
 		ignored.insert(ign);
 	}
 }
-void Cache::dbset(ITdb *db, std::string title, unsigned short plays, unsigned long ts) {
+void Cache::dbset(CacheITdb *db, std::string title, unsigned short plays, unsigned long ts) {
 	(*db)[title] = std::pair<unsigned short, unsigned long>(plays, ts);
 }
-std::pair<unsigned short, unsigned long> Cache::dbget(ITdb *db, Itdb_Track *tr) {
+std::pair<unsigned short, unsigned long> Cache::dbget(CacheITdb *db, Itdb_Track *tr) {
 	std::pair<unsigned short, unsigned long> data;
 	if (db->contains(tr->title) && !ignored.contains(tr->artist)) {
 		data = db->at(tr->title);

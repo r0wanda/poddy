@@ -22,11 +22,22 @@ struct LastFmSettings {
 	bool useCache = false;
 	std::vector<std::string> ignoredArtists;
 };
+
+LastfmIgnList::LastfmIgnList(const nlohmann::json &list) {
+	
+}
+
+LastfmIgnore::LastfmIgnore(const nlohmann::json &sch) {
+	// TODO: patch
+	schema.validate(sch);
+	
+}
+
 Lastfm::Lastfm(const char *key, const char *sec):
 	apikey(key), secret(sec),
 	userAgent("poddy (https://github.com/r0wanda/poddy)"),
 	baseUrl("https://ws.audioscrobbler.com/2.0/"),
-	cache() {
+	cache(cachePath / "lastpod.db", configPath / "ignore.json") {
 	cURLpp::initialize();
 };
 

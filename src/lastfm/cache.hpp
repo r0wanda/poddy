@@ -5,16 +5,15 @@
 #include <unordered_set>
 #include <unordered_map>
 
-typedef  ITdb;
+typedef std::unordered_map<std::string, std::pair<unsigned short, unsigned long>> CacheITdb;
 class Cache {
-	typedef std::unordered_map<std::string, std::pair<unsigned short, unsigned long>> ITdb;
 public:
 	unsigned long initdbts;
 	std::string lfmsk;
-	ITdb initdb;
-	ITdb db;
+	CacheITdb initdb;
+	CacheITdb db;
 	std::unordered_set<std::string> ignored;
-    Cache();
+    Cache(const std::filesystem::path &path, const std::filesystem::path &ign);
 	void read();
 	void dbset(ITdb *db, std::string title, unsigned short plays, unsigned long ts);
 	std::pair<unsigned short, unsigned long> dbget(ITdb *db, Itdb_Track *tr);
